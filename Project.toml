@@ -3,6 +3,10 @@ uuid = "c9d4266f-a5cb-439d-837c-c97b191379f5"
 authors = ["Mark Kittisopikul <kittisopikulm@janelia.hhmi.org> and contributors"]
 version = "0.1.0"
 
+[deps]
+NUMA_jll = "7f51dc2b-bb24-59f8-b771-bb1490e4195d"
+SaferIntegers = "88634af6-177f-5301-88b8-7819386cfa38"
+
 [compat]
 julia = "1"
 
