@@ -1,10 +1,11 @@
 module LibNUMA
 
+using ..ArrayAllocators: AbstractArrayAllocator
 using NUMA_jll
 
 const libnuma = NUMA_jll.libnuma
 
-struct LibNumaAllocator
+struct LibNumaAllocator <: AbstractArrayAllocator
     node::Cint
 end
 
