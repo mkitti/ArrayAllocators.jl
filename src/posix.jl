@@ -13,7 +13,7 @@ struct MemAlign <: AbstractArrayAllocator
     end
 end
 
-function Array{T}(alloc::MemAlign, dims)
+function Array{T}(alloc::MemAlign, dims) where T
     isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))
     p = Ref{Ptr{T}}()
     n = sizeof(T) * prod(dims)
