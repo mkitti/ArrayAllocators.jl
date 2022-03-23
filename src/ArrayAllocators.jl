@@ -107,7 +107,7 @@ end
     import .Windows: WinNumaAllocator
     const NumaAllocator = WinNumaAllocator
     export NumaAllocator
-elseif NUMA_jll.is_available()
+elseif NUMA_jll.is_available() && VERSION >= v"1.3"
     include("LibNUMA.jl")
     import .LibNUMA: LibNumaAllocator
     const NumaAllocator = LibNumaAllocator
