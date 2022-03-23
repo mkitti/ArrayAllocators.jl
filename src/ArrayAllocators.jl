@@ -109,6 +109,7 @@ end
     export NumaAllocator
 elseif NUMA_jll.is_available()
     include("LibNUMA.jl")
+    import .LibNUMA: LibNumaAllocator
     const NumaAllocator = LibNumaAllocator
     export NumaAllocator
 end
