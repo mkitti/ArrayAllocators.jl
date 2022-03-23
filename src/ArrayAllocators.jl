@@ -1,6 +1,9 @@
 module ArrayAllocators
 
-using SaferIntegers, NUMA_jll
+using SaferIntegers
+@static if VERSION >= v"1.3"
+    using NUMA_jll
+end
 
 import Core: Array
 
@@ -107,7 +110,7 @@ end
     import .Windows: WinNumaAllocator
     const NumaAllocator = WinNumaAllocator
     export NumaAllocator
-elseif NUMA_jll.is_available() && VERSION >= v"1.3"
+elseif VERSION >= v"1.3" && NUMA_jll.is_available()
     include("LibNUMA.jl")
     import .LibNUMA: LibNumaAllocator
     const NumaAllocator = LibNumaAllocator
