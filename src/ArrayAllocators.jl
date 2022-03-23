@@ -114,4 +114,10 @@ elseif NUMA_jll.is_available()
     export NumaAllocator
 end
 
+@static if Sys.isunix()
+    include("posix.jl")
+    import .POSIX: MemAlign
+    export MemAlign
+end
+
 end # module ArrayAllocators
