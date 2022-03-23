@@ -22,6 +22,8 @@ const PAGE_READWRITE = 0x04
 const MEM_DECOMMIT = 0x00004000
 const MEM_RELEASE  = 0x00008000
 
+const DWORD = Culong
+
 #=
 LPVOID VirtualAllocEx(
   [in]           HANDLE hProcess,

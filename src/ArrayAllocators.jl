@@ -4,6 +4,9 @@ using SaferIntegers, NUMA_jll
 
 import Core: Array
 
+export malloc, safe_malloc
+export calloc, safe_calloc
+
 abstract type AbstractArrayAllocator end
 
 function Array{T}(alloc::A, dims...) where {A <: AbstractArrayAllocator, T}
@@ -103,10 +106,11 @@ end
     include("windows.jl")
     import .Windows: WinNumaAllocator
     const NumaAllocator = WinNumaAllocator
-end
-
-@static if NUMA_jll.is_available()
-    include("libnuma.jl")
+    export NumaAllocator
+elseif NUMA_jll.is_available()
+    include("LibNUMA.jl")
+    const NumaAllocator = LibNumaAllocator
+    export NumaAllocator
 end
 
 end # module ArrayAllocators
