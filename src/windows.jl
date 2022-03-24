@@ -74,7 +74,6 @@ BOOL VirtualFreeEx(
 =#
 
 const BOOL = Cint
-const DWORD = UInt32
 
 function VirtualFreeEx(hProcess, lpAddress, dwSize, dwFreeType)
     ccall((:VirtualFreeEx, kernel32),
@@ -90,14 +89,15 @@ function virtual_free(array::Array{T}) where T
     VirtualFreeEx(pointer(array))
 end
 
-function wrap_virtual(ptr::Ptr{T}, dims) where T
+function wrap_virtual(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray{T}}
     if ptr == C_NULL
         throw(OutOfMemoryError())
     end
-    arr = unsafe_wrap(Array{T}, ptr, dims; own = false)
+    arr = unsafe_wrap(A, ptr, dims; own = false)
     finalizer(virtual_free, arr)
     return arr
 end
+wrap_virtual(ptr::Ptr{T}, dims) where T = wrap_virtual(Array{T}, ptr, dims)
 
 struct WinVirtualAllocator <: AbstractArrayAllocator
 end
@@ -112,6 +112,7 @@ end
 
 struct SafeWinVirtualAllocator <: AbstractArrayAllocator
 end
+
 const safe_virtual = SafeWinVirtualAllocator()
 function Array{T}(::SafeWinVirtualAllocator, dims) where T
     size = SafeInt(sizeof(T))
@@ -121,11 +122,9 @@ function Array{T}(::SafeWinVirtualAllocator, dims) where T
     return wrap_virtual(ptr, dims)
 end
 
-
 struct WinNumaAllocator <: AbstractArrayAllocator
     node::Int
 end
-
 
 function Array{T}(n::WinNumaAllocator, dims) where T
     size = sizeof(T)

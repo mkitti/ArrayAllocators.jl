@@ -17,20 +17,22 @@ function Array{T}(alloc::A, dims...) where {A <: AbstractArrayAllocator, T}
 end
 
 """
-    wrap_libc_pointer(ptr::Ptr{T})
+    wrap_libc_pointer(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray{T}}
+    wrap_libc_pointer(ptr::Ptr{T}, dims) where {T, A <: AbstractArray{T}}
 
 Checks to see if `ptr` is C_NULL for an OutOfMemoryError.
 Owns the array such that `Libc.free` is used.
 """
-function wrap_libc_pointer(ptr::Ptr{T}, dims) where T
+function wrap_libc_pointer(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray{T}}
     if ptr == C_NULL
         throw(OutOfMemoryError())
     end
-    arr = unsafe_wrap(Array{T}, ptr, dims; own = true)
+    arr = unsafe_wrap(A, ptr, dims; own = true)
     # We use own = true above
     # finalizer(f->Libc.free(pointer(f)), arr)
     return arr
 end
+wrap_libc_pointer(ptr::Ptr{T}, dims) where T = wrap_libc_pointer(Array{T}, ptr, dims)
 
 abstract type AbstractMallocAllocator <: AbstractArrayAllocator end
 
