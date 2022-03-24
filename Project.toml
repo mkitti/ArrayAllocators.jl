@@ -8,6 +8,7 @@ NUMA_jll = "7f51dc2b-bb24-59f8-b771-bb1490e4195d"
 SaferIntegers = "88634af6-177f-5301-88b8-7819386cfa38"
 
 [compat]
+SaferIntegers = "3"
 julia = "1"
 
 [extras]
