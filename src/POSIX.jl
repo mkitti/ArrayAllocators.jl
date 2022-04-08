@@ -29,7 +29,7 @@ end
 
 struct MemAlign{B} <: AbstractMemAlign{B}
     alignment::Integer
-    function MemAlign{B}(alignment)
+    function MemAlign{B}(alignment) where B
         check_alignment(alignment)
         return new{B}(alignment)
     end
@@ -37,7 +37,7 @@ end
 
 MemAlign(alignment) = MemAlign{DefaultByteCalculator}(alignment)
 
-function allocate(alloc::MemAlign{B}, ::Type{T}, num_bytes)
+function allocate(alloc::MemAlign{B}, ::Type{T}, num_bytes) where B
     isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))
     p = Ref{Ptr{T}}()
     err = ccall(:posix_memalign, Cint, (Ref{Ptr{T}}, Csize_t, Csize_t), p, alloc.alignment, num_bytes)
