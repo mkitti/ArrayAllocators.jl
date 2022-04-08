@@ -1,7 +1,6 @@
 module Windows
 
-using ..ArrayAllocators: AbstractArrayAllocator
-using SaferIntegers
+import ..ArrayAllocators: AbstractArrayAllocator, DefaultByteCalculator, nbytes, allocate
 import Base: Array
 
 const hCurrentProcess = ccall((:GetCurrentProcess, "kernel32"), Ptr{Nothing}, ())
@@ -43,26 +42,6 @@ function VirtualAllocEx(dwSize)
     VirtualAllocEx(hCurrentProcess, C_NULL, dwSize, MEM_COMMIT_RESERVE, PAGE_READWRITE)
 end
 
-#=
-LPVOID VirtualAllocExNuma(
-  [in]           HANDLE hProcess,
-  [in, optional] LPVOID lpAddress,
-  [in]           SIZE_T dwSize,
-  [in]           DWORD  flAllocationType,
-  [in]           DWORD  flProtect,
-  [in]           DWORD  nndPreferred
-);
-=#
-
-
-function VirtualAllocExNuma(hProcess, lpAddress, dwSize, flAllocationType, flProtect, nndPreferred)
-    ccall((:VirtualAllocExNuma, kernel32),
-        Ptr{Nothing}, (Ptr{Nothing}, Ptr{Nothing}, Csize_t, Culong, Culong, Culong),
-        hProcess, lpAddress, dwSize, flAllocationType, flProtect, nndPreferred)
-end
-function VirtualAllocExNuma(dest_size, numa_node)
-    VirtualAllocExNuma(hCurrentProcess, C_NULL, dest_size, MEM_COMMIT_RESERVE, PAGE_READWRITE, numa_node)
-end
 
 #=
 BOOL VirtualFreeEx(
@@ -86,7 +65,7 @@ function VirtualFreeEx(lpAddress)
 end
 
 function virtual_free(array::Array{T}) where T
-    VirtualFreeEx(pointer(array))
+    VirtualFreeEx(array)
 end
 
 function wrap_virtual(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray{T}}
@@ -99,51 +78,22 @@ function wrap_virtual(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray
 end
 wrap_virtual(ptr::Ptr{T}, dims) where T = wrap_virtual(Array{T}, ptr, dims)
 
-struct WinVirtualAllocator <: AbstractArrayAllocator
+abstract type AbstractWinVirtualAllocator{B} <: AbstractArrayAllocator{B} end
+allocate(::AbstractWinVirtualAllocator, num_bytes) =  VirtualAllocEx(num_bytes)
+Base.unsafe_wrap(::AbstractWinVirtualAllocator, args...) = wrap_virtual(args...)
+
+struct WinVirtualAllocator{B} <: AbstractWinVirtualAllocator{B}
 end
+WinVirtualAllocator() = WinVirtualAllocator{DefaultByteCalculator}()
+
 const virtual = WinVirtualAllocator()
-function Array{T}(::WinVirtualAllocator, dims) where T
-    size = sizeof(T)
-    num = prod(dims)
-    num_bytes = num*size
+
+#=
+function (::Type{ArrayType})(::AbstractWinVirtualAllocator{B}, dims) where {B, T, ArrayType <: AbstractArray{T}}
+    num_bytes = nbytes(B{T}(dims))
     ptr = Ptr{T}(VirtualAllocEx(num_bytes))
-    return wrap_virtual(ptr, dims)
+    return wrap_virtual(ArrayType, ptr, dims)
 end
+=#
 
-struct SafeWinVirtualAllocator <: AbstractArrayAllocator
-end
-
-const safe_virtual = SafeWinVirtualAllocator()
-function Array{T}(::SafeWinVirtualAllocator, dims) where T
-    size = SafeInt(sizeof(T))
-    num = prod(SafeInt.(dims))
-    num_bytes = num*size
-    ptr = Ptr{T}(VirtualAllocEx(num_bytes))
-    return wrap_virtual(ptr, dims)
-end
-
-struct WinNumaAllocator <: AbstractArrayAllocator
-    node::Int
-end
-
-function Array{T}(n::WinNumaAllocator, dims) where T
-    size = sizeof(T)
-    num = prod(dims)
-    num_bytes = num*size
-    ptr = Ptr{T}(VirtualAllocExNuma(num_bytes, n.node))
-    return wrap_virtual(ptr, dims)
-end
-
-struct SafeWinNumaAllocator <: AbstractArrayAllocator
-    node::Int
-end
-
-function Array{T}(n::SafeWinNumaAllocator, dims) where T
-    size = SafeInt(sizeof(T))
-    num = prod(SafeInt.(dims))
-    num_bytes = num*size
-    ptr = Ptr{T}(VirtualAllocExNuma(num_bytes, n.node))
-    return wrap_virtual(ptr, dims)
-end
-
-end
+end # module Windows

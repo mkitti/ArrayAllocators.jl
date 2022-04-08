@@ -1,5 +1,14 @@
+using Pkg
 using ArrayAllocators
+using ArrayAllocators.ByteCalculators
 using Test
+
+# Load in subpackages
+Pkg.develop(path=joinpath(dirname(@__DIR__), "./NumaArrayAllocators"))
+Pkg.develop(path=joinpath(dirname(@__DIR__), "./SafeByteCalculators"))
+
+using NumaArrayAllocators
+using SafeByteCalculators
 
 @testset "ArrayAllocators.jl" begin
     A = zeros(UInt8, 2048, 2048);
@@ -8,15 +17,20 @@ using Test
     @test A == B
     @test size(M) == (1024, 4096)
     
-    @test_throws OverflowError Array{UInt8}(safe_calloc, 20480000, typemax(Int64));
-    @test_throws OverflowError Array{UInt16}(safe_calloc, 2, typemax(Int64)÷2);
+    @test_throws OverflowError Array{UInt8}(calloc, 20480000, typemax(Int64))
+    @test_throws OverflowError Array{UInt16}(calloc, 2, typemax(Int64)÷2)
+
+    @test_throws OverflowError Array{UInt16}(MallocAllocator(), 2, typemax(Int64)÷2)
+    @test_throws OverflowError Array{UInt16}(MallocAllocator{CheckedMulByteCalculator}(), 2, typemax(Int64)÷2)
+    @test_throws OverflowError Array{UInt16}(MallocAllocator{WideningByteCalculator}(), 2, typemax(Int64)÷2)
+    @test_throws OverflowError Array{UInt16}(MallocAllocator{SafeByteCalculator}(), 2, typemax(Int64)÷2)
 
     if isdefined(ArrayAllocators, :Windows)
         WV = Array{UInt8}(ArrayAllocators.Windows.virtual, 64, 1024);
         @test size(WV) == (64, 1024)
         @test WV == zeros(UInt8, 64, 1024)
     end
-    if isdefined(ArrayAllocators, :NumaAllocator)
+    if isdefined(NumaArrayAllocators, :NumaAllocator)
         C = Array{UInt8}(NumaAllocator(0), 2048, 2048);
         @test A == C
     end

@@ -1,0 +1,18 @@
+name = "NumaArrayAllocators"
+uuid = "21436f30-1b4a-4f08-87af-e26101bb5379"
+authors = ["Mark Kittisopikul <kittisopikulm@janelia.hhmi.org> and contributors"]
+version = "0.1.0"
+
+[deps]
+ArrayAllocators = "c9d4266f-a5cb-439d-837c-c97b191379f5"
+NUMA_jll = "7f51dc2b-bb24-59f8-b771-bb1490e4195d"
+
+[compat]
+ArrayAllocators = "0.2"
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
