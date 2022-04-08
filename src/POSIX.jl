@@ -31,7 +31,7 @@ struct MemAlign{B} <: AbstractMemAlign{B}
     alignment::Integer
     function MemAlign(alignment)
         check_alignment(alignment)
-        return new(alignment)
+        return new{B}(alignment)
     end
 end
 
