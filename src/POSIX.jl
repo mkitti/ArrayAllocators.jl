@@ -37,7 +37,7 @@ end
 
 MemAlign(alignment) = MemAlign{DefaultByteCalculator}(alignment)
 
-function allocate(alloc::MemAlign{B}, ::Type{T}, num_bytes) where B
+function allocate(alloc::MemAlign{B}, ::Type{T}, num_bytes) where {B, T}
     isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))
     p = Ref{Ptr{T}}()
     err = ccall(:posix_memalign, Cint, (Ref{Ptr{T}}, Csize_t, Csize_t), p, alloc.alignment, num_bytes)
