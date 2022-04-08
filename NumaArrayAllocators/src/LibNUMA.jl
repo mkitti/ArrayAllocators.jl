@@ -10,6 +10,10 @@ function numa_alloc_onnode(size, node)
     @ccall libnuma.numa_alloc_onnode(size::Csize_t, node::Cint)::Ptr{Nothing}
 end
 
+function numa_free(arr::AbstractArray)
+    numa_free(arr, sizeof(arr))
+end
+
 function numa_free(mem, size)
     @ccall libnuma.numa_free(mem::Ptr{nothing}, size::Csize_t)::Nothing
 end

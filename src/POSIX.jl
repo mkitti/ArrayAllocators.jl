@@ -1,6 +1,7 @@
 module POSIX
 
 using ..ArrayAllocators: AbstractArrayAllocator, wrap_libc_pointer, DefaultByteCalculator, LibcArrayAllocator
+import ..ArrayAllocators: allocate
 export MemAlign
 
 abstract type AbstractMemAlign{B} <: LibcArrayAllocator{B} end
