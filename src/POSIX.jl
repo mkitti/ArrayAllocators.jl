@@ -29,13 +29,13 @@ end
 
 struct MemAlign{B} <: AbstractMemAlign{B}
     alignment::Integer
-    function MemAlign(alignment)
+    function MemAlign{B}(alignment)
         check_alignment(alignment)
         return new{B}(alignment)
     end
 end
 
-MemAlign(alignment) = MemAlign{DefaultByteCalculator}(b)
+MemAlign(alignment) = MemAlign{DefaultByteCalculator}(alignment)
 
 function allocate(alloc::MemAlign{B}, ::Type{T}, num_bytes)
     isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))
