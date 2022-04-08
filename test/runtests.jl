@@ -4,8 +4,8 @@ using ArrayAllocators.ByteCalculators
 using Test
 
 # Load in subpackages
-Pkg.develop(path=joinpath(dirname(@__DIR__), "./NumaArrayAllocators"))
-Pkg.develop(path=joinpath(dirname(@__DIR__), "./SafeByteCalculators"))
+Pkg.develop(PackageSpec(path=joinpath(dirname(@__DIR__), "./NumaArrayAllocators")))
+Pkg.develop(PackageSpec(path=joinpath(dirname(@__DIR__), "./SafeByteCalculators")))
 
 using NumaArrayAllocators
 using SafeByteCalculators
