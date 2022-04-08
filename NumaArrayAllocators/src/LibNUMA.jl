@@ -1,7 +1,7 @@
 module LibNUMA
 
 using ..NumaArrayAllocators: AbstractNumaAllocator
-using ArrayAllocators: AbstractArrayAllocator, DefaultByteCalculator, nbytes, allocate
+import ArrayAllocators: AbstractArrayAllocator, DefaultByteCalculator, nbytes, allocate
 using NUMA_jll
 
 const libnuma = NUMA_jll.libnuma
