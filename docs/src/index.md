@@ -42,5 +42,5 @@ Memory allocators may report success after allocating an wrapped around number o
 ```
 
 ```@autodocs
-Modules = [ArrayAllocators]
+Modules = [ArrayAllocators, ByteCalculators]
 ```

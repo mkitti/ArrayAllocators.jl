@@ -96,9 +96,8 @@ MallocAllocator singleton.
 # Example
 
 ```jldoctest
-julia> Array{UInt8}(malloc, 16, 16)
-16×16 Matrix{UInt8}:
-...
+julia> Array{UInt8}(malloc, 16, 16);
+
 ```
 
 """
@@ -134,9 +133,10 @@ CallocAllocator singleton.
 # Example
 
 ```jldoctest
-julia> Array{UInt8}(calloc, 16, 16)
-16×16 Matrix{UInt8}:
-...
+julia> A = Array{UInt8}(calloc, 16, 16);
+
+julia> sum(A)
+0x0000000000000000
 ```
 """
 const calloc = CallocAllocator()
