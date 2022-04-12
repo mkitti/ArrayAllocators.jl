@@ -45,8 +45,9 @@ Allocate arrays using the builtin `undef` method. The `B` parameter is a `ByteCa
 """
 struct UndefArrayAllocator{B} <: AbstractArrayAllocator{B}
 end
-allocate(::UndefArrayAllocator, num_bytes) = nothing
-Base.unsafe_wrap(::UndefArrayAllocator, ::Type{ArrayType}, ::Nothing, dims::Dims) where {T, ArrayType <: AbstractArray{T}} = ArrayType(undef, dims)
+UndefArrayAllocator() = UndefArrayAllocator{DefaultByteCalculator}()
+allocate(::UndefArrayAllocator, num_bytes) = C_NULL
+Base.unsafe_wrap(::UndefArrayAllocator, ::Type{ArrayType}, ::Ptr, dims::Dims) where {T, ArrayType <: AbstractArray{T}} = ArrayType(undef, dims)
 
 #=
 function (::Type{ArrayType})(::UndefArrayAllocator{B}, dims) where {T, B, ArrayType <: AbstractArray{T}}
