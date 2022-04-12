@@ -31,7 +31,7 @@ NumaAllocator
     import .Windows: WinNumaAllocator
 
     const NumaAllocator = WinNumaAllocator
-elseif VERSION >= v"1.3" && NUMA_jll.is_available()
+elseif ( VERSION >= v"1.6" && NUMA_jll.is_available() ) || isdefined(NUMA_jll, :libnuma)
     include("LibNUMA.jl")
     import .LibNUMA: LibNumaAllocator
 
