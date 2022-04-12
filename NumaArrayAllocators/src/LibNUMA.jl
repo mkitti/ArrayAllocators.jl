@@ -7,7 +7,7 @@ using NUMA_jll
 const libnuma = NUMA_jll.libnuma
 
 function numa_alloc_onnode(size, node)
-    @ccall libnuma.numa_alloc_onnode(size::Csize_t, node::Cint)::Ptr{Nothing}
+    return ccall((libnuma, :numa_alloc_onnode), Ptr{Nothing}, (Csize_t, Cint), size, node)
 end
 
 function numa_free(arr::AbstractArray)
@@ -15,7 +15,7 @@ function numa_free(arr::AbstractArray)
 end
 
 function numa_free(mem, size)
-    @ccall libnuma.numa_free(mem::Ptr{nothing}, size::Csize_t)::Nothing
+    return ccall((libnuma, :numa_free), Nothing, (Ptr{Nothing}, Csize_t), mem, size)
 end
 
 function wrap_numa(::Type{ArrayType}, ptr::Ptr{T}, dims) where {T, ArrayType <: AbstractArray{T}}
