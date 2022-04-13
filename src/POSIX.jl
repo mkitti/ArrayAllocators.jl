@@ -8,6 +8,12 @@ abstract type AbstractMemAlign{B} <: LibcArrayAllocator{B} end
 
 # Copied from https://github.com/JuliaPerf/BandwidthBenchmark.jl/blob/main/src/allocate.jl
 # Copyright (c) 2021 Carsten Bauer <crstnbr@gmail.com> and contributors
+function check_alignment(alignment)
+    ispow2(alignment) || throw(ArgumentError("$alignment is not a power of 2"))
+    alignment ≥ sizeof(Int) || throw(ArgumentError("$alignment is not a multiple of $(sizeof(T))"))
+    return nothing
+end
+
 """
     MemAlign(alignment::Integer)
 
@@ -22,12 +28,6 @@ julia> Array{UInt8}(MemAlign(32), 16, 16)
 ...
 ```
 """
-function check_alignment(alignment)
-    ispow2(alignment) || throw(ArgumentError("$alignment is not a power of 2"))
-    alignment ≥ sizeof(Int) || throw(ArgumentError("$alignment is not a multiple of $(sizeof(T))"))
-    return nothing
-end
-
 struct MemAlign{B} <: AbstractMemAlign{B}
     alignment::Integer
     function MemAlign{B}(alignment) where B
