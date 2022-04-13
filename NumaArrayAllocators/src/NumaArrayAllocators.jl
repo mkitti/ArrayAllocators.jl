@@ -38,6 +38,19 @@ elseif ( VERSION >= v"1.6" && NUMA_jll.is_available() ) || isdefined(NUMA_jll, :
     const NumaAllocator = LibNumaAllocator
 end
 
+"""
+    numa(node)
+
+Create a `NumaAllocator` on NUMA node `node`. Short hand for `NumaAllocator` constructor.
+
+# Example
+
+```jldoctest
+julia> Array{UInt8}(numa(0), 32, 32);
+```
+"""
+numa
+
 if @isdefined(NumaAllocator)
     numa(node) = NumaAllocator(node)
 end

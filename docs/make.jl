@@ -1,4 +1,6 @@
 using ArrayAllocators
+using SafeByteCalculators
+using NumaArrayAllocators
 using Documenter
 
 DocMeta.setdocmeta!(ArrayAllocators, :DocTestSetup, :(using ArrayAllocators); recursive=true)
@@ -15,6 +17,8 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Byte Calculators" => "bytecalculators.md",
+        "NUMA" => "numa.md"
     ],
 )
 
