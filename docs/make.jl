@@ -25,4 +25,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/mkitti/ArrayAllocators.jl",
     devbranch="main",
+    push_preview = true
 )
