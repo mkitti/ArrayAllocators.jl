@@ -17,9 +17,11 @@ function check_alignment(alignment)
     return nothing
 end
 
-function posix_memalign(ptr, alignment, num_bytes)
-    err = ccall(:posix_memalign, Cint, (Ref{Ptr{T}}, Csize_t, Csize_t), ptr, alignment, num_bytes)
-    return err
+function posix_memalign(alignment, num_bytes)
+    ptr = Ref{Ptr{Cvoid}}()
+    err = ccall(:posix_memalign, Cint, (Ref{Ptr{Cvoid}}, Csize_t, Csize_t), ptr, alignment, num_bytes)
+    iszero(err) || throw(OutOfMemoryError())
+    return ptr
 end
 
 """
@@ -48,10 +50,8 @@ MemAlign(alignment) = MemAlign{DefaultByteCalculator}(alignment)
 
 function allocate(alloc::MemAlign{B}, ::Type{T}, num_bytes) where {B, T}
     isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))
-    p = Ref{Ptr{T}}()
-    err = posix_memalign(p, alloc.alignment, num_bytes)
-    iszero(err) || throw(OutOfMemoryError())
-    return p[]
+    p = posix_memalign(alloc.alignment, num_bytes)
+    return Ptr{T}(p[])
 end
 
 end # module POSIX
