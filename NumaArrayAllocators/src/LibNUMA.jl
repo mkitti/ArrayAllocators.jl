@@ -42,12 +42,4 @@ function allocate(n::LibNumaAllocator, num_bytes)
     return numa_alloc_onnode(num_bytes, n.node)
 end
 
-#=
-function (::Type{ArrayType})(n::AbstractLibNumaAllocator{B}, dims) where {T, B, ArrayType <: AbstractArray{T}}
-    num_bytes = nbytes(B{T}(dims))
-    ptr = Ptr{T}(numa_alloc_onnode(num_bytes, n.node))
-    return wrap_numa(ArrayType, ptr, dims)
-end
-=#
-
 end # module LibNUMA

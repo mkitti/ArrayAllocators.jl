@@ -88,12 +88,4 @@ WinVirtualAllocator() = WinVirtualAllocator{DefaultByteCalculator}()
 
 const virtual = WinVirtualAllocator()
 
-#=
-function (::Type{ArrayType})(::AbstractWinVirtualAllocator{B}, dims) where {B, T, ArrayType <: AbstractArray{T}}
-    num_bytes = nbytes(B{T}(dims))
-    ptr = Ptr{T}(VirtualAllocEx(num_bytes))
-    return wrap_virtual(ArrayType, ptr, dims)
-end
-=#
-
 end # module Windows

@@ -47,14 +47,7 @@ struct UndefArrayAllocator{B} <: AbstractArrayAllocator{B}
 end
 UndefArrayAllocator() = UndefArrayAllocator{DefaultByteCalculator}()
 allocate(::UndefArrayAllocator, num_bytes) = C_NULL
-Base.unsafe_wrap(::UndefArrayAllocator, ::Type{ArrayType}, ::Ptr, dims::Dims) where {T, ArrayType <: AbstractArray{T}} = ArrayType(undef, dims)
-
-#=
-function (::Type{ArrayType})(::UndefArrayAllocator{B}, dims) where {T, B, ArrayType <: AbstractArray{T}}
-    byteCalc = nbytes(B{T}(dims))
-    return ArrayType(undef, dims)
-end
-=#
+Base.unsafe_wrap(::UndefArrayAllocator, ::Type{ArrayType}, ::Ptr, dims::Dims) where {T, ArrayType <: AbstractArray{T}} = ArrayType(Core.undef, dims)
 
 abstract type LibcArrayAllocator{B} <: AbstractArrayAllocator{B} end
 
@@ -104,14 +97,6 @@ julia> Array{UInt8}(malloc, 16, 16);
 """
 const malloc = MallocAllocator()
 
-#=
-function (::Type{ArrayType})(::MallocAllocator{B}, dims) where {B, T, ArrayType <: AbstractArray{T}}
-    byteCalc = B{T}(dims)
-    ptr = Libc.malloc(nbytes(byteCalc))
-    return wrap_libc_pointer(ArrayType, Ptr{T}(ptr), dims)
-end
-=#
-
 """
     CallocAllocator()
 
@@ -141,14 +126,6 @@ julia> sum(A)
 ```
 """
 const calloc = CallocAllocator()
-
-#=
-function (::Type{ArrayType})(::CallocAllocator{B}, dims) where {T, B, ArrayType <: AbstractArray{T}}
-    byteCalc = B{T}(dims)
-    ptr = Libc.calloc(nbytes(byteCalc), 1)
-    return wrap_libc_pointer(ArrayType, Ptr{T}(ptr), dims)
-end
-=#
 
 @static if Sys.iswindows()
     include("Windows.jl")

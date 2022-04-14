@@ -38,12 +38,4 @@ function allocate(n::WinNumaAllocator, num_bytes)
 end
 Base.unsafe_wrap(::WinNumaAllocator, args...) = wrap_virtual(args...)
 
-#=
-function (::Type{ArrayType})(n::WinNumaAllocator{B}, dims) where {T, B, ArrayType <: AbstractArray{T}}
-    num_bytes = nbytes(B{T}(dims))
-    ptr = Ptr{T}(VirtualAllocExNuma(num_bytes, n.node))
-    return wrap_virtual(ArrayType, ptr, dims)
-end
-=#
-
 end # module Windows
