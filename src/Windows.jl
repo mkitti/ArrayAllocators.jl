@@ -42,6 +42,27 @@ function VirtualAllocEx(dwSize)
     VirtualAllocEx(hCurrentProcess, C_NULL, dwSize, MEM_COMMIT_RESERVE, PAGE_READWRITE)
 end
 
+#=
+PVOID VirtualAlloc2(
+  [in, optional]      HANDLE                 Process,
+  [in, optional]      PVOID                  BaseAddress,
+  [in]                SIZE_T                 Size,
+  [in]                ULONG                  AllocationType,
+  [in]                ULONG                  PageProtection,
+  [in, out, optional] MEM_EXTENDED_PARAMETER *ExtendedParameters,
+  [in]                ULONG                  ParameterCount
+);
+=#
+function VirtualAlloc2(Process, BaseAddress, Size, AllocationType, PageProtection, ExtendedParameters, ParameterCount)
+    ccall((:VirtualAlloc2, kernel32), Ptr{Nothing},
+          (Ptr{Nothing}, Ptr{Nothing}, Csize_t, Culong, Culong, Ptr{Nothing}, Culong),
+          Process, BaseAddress, Size, AllocationType, PageProtection, ExtendedParameters, ParameterCount
+         )
+end
+function VirtualAlloc2(Process, BaseAddress, Size, AllocationType, PageProtection, ParameterCount)
+    VirtualAlloc2(Process, BaseAddress, Size, AllocationType, PageProtection, C_NULL, ParameterCount)
+end
+
 
 #=
 BOOL VirtualFreeEx(
