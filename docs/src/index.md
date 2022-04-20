@@ -15,7 +15,7 @@ in order to create arrays from pointers. A finalizer is also added for allocator
 The original inspiration for this package is the memory allocator [`calloc`](https://en.cppreference.com/w/c/memory/calloc).
 `calloc` allocates the memory and guarantees that the memory will be initialized by zeros. By this definition, it would appear
 equivalent to `Base.zeros`. However, `calloc` is potentially able to take advantage of operating system facilities that allocate
-memory lazily on demand rather than eagerly. Additonally, it may be able to obtain memory from the operating system that has
+memory lazily on demand rather than eagerly. Additionally, it may be able to obtain memory from the operating system that has
 already been initialized by zeros due to security constraints. On many systems, this allocator returns as quickly as `malloc`,
 the allocator used by `Array{T}(undef, dims)`. In particular, in Python, [`numpy.zeros`](https://github.com/juliantaylor/numpy/commit/d271d977bdfb977959db1ff26956666f3836b56b) uses `calloc`, which may at times appear faster than `Base.zeros` in Julia.
 
