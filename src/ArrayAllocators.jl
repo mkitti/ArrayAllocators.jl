@@ -12,6 +12,7 @@ using .ByteCalculators
 const DefaultByteCalculator = CheckedMulByteCalculator
 
 export AbstractArrayAllocator, UndefArrayAllocator, MallocAllocator, CallocAllocator
+export MemAlign
 
 
 """
@@ -127,14 +128,25 @@ julia> sum(A)
 """
 const calloc = CallocAllocator()
 
+"""
+    MemAlign(alignment::Integer)
+
+Allocate aligned memory. Alias for platform specific implementations.
+
+`alignment` must be a power of 2 and larger than `sizeof(Int)`
+
+POSIX (Linux and macOS): [`PosixMemAlign`](@ref)
+"""
+MemAlign
+
 @static if Sys.iswindows()
     include("Windows.jl")
 end
 
 @static if Sys.isunix()
     include("POSIX.jl")
-    import .POSIX: MemAlign
-    export MemAlign
+    import .POSIX: PosixMemAlign
+    const MemAlign = PosixMemAlign
 end
 
 end # module ArrayAllocators
