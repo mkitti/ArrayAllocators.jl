@@ -25,7 +25,7 @@ function posix_memalign(alignment, num_bytes)
 end
 
 """
-    MemAlign(alignment::Integer)
+    PosixMemAlign(alignment::Integer)
 
 Use `posix_memalign` to allocate aligned memory.
 `alignment` must be a power of 2 and larger than `sizeof(Int)`
@@ -33,22 +33,23 @@ Use `posix_memalign` to allocate aligned memory.
 # Example
 
 ```julia
-julia> Array{UInt8}(MemAlign(32), 16, 16)
+julia> Array{UInt8}(PosixMemAlign(32), 16, 16)
 64×64 Matrix{UInt8}:
 ...
 ```
 """
-struct MemAlign{B} <: AbstractMemAlign{B}
+struct PosixMemAlign{B} <: AbstractMemAlign{B}
     alignment::Integer
-    function MemAlign{B}(alignment) where B
+    function PosixMemAlign{B}(alignment) where B
         check_alignment(alignment)
         return new{B}(alignment)
     end
 end
 
-MemAlign(alignment) = MemAlign{DefaultByteCalculator}(alignment)
+PosixMemAlign(alignment) = PosixMemAlign{DefaultByteCalculator}(alignment)
+Base.unsafe_wrap(alloc::PosixMemAlign, args...) = wrap_libc_pointer(args...)
 
-function allocate(alloc::MemAlign{B}, ::Type{T}, num_bytes) where {B, T}
+function allocate(alloc::PosixMemAlign{B}, ::Type{T}, num_bytes) where {B, T}
     isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))
     p = posix_memalign(alloc.alignment, num_bytes)
     return Ptr{T}(p[])
