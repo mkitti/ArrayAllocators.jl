@@ -36,8 +36,10 @@ using SafeByteCalculators
     end
 
     if isdefined(ArrayAllocators, :MemAlign)
-        D = Array{UInt8}(MemAlign(8), 1024, 4096)
+        memalign = MemAlign()
+        D = Array{UInt8}(memalign, 1024, 4096)
         @test size(D) == (1024, 4096)
+        @test reinterpret(Int, pointer(D)) % ArrayAllocators.alignment(memalign) == 0
     end
 
 end

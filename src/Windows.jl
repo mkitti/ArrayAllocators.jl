@@ -1,11 +1,15 @@
 module Windows
 
 import ..ArrayAllocators: AbstractArrayAllocator, DefaultByteCalculator, nbytes, allocate
+import ..ArrayAllocators: AbstractMemAlign
 import Base: Array
+
+export WinMemAlign
 
 const hCurrentProcess = ccall((:GetCurrentProcess, "kernel32"), Ptr{Nothing}, ())
 
 const kernel32 = "kernel32"
+const kernelbase = "kernelbase"
 const MEM_COMMIT      = 0x00001000
 const MEM_RESERVE     = 0x00002000
 const MEM_RESET       = 0x00080000
@@ -22,6 +26,33 @@ const MEM_DECOMMIT = 0x00004000
 const MEM_RELEASE  = 0x00008000
 
 const DWORD = Culong
+
+abstract type MemExtendedParameterType end
+
+struct MemAddressRequirements
+    lowestStartingAddress::Ptr{Nothing}
+    highestStartingAddress::Ptr{Nothing}
+    alignment::Csize_t
+end
+MemAddressRequirements(alignment) = MemAddressRequirements(C_NULL, C_NULL, alignment)
+
+struct MemExtendedParameterAddressRequirements <: MemExtendedParameterType
+    type::UInt64
+    requirements::Base.RefValue{MemAddressRequirements}
+    function MemExtendedParameterAddressRequirements(requirements)
+        new(1, Ref(requirements))
+    end
+end
+
+struct _MemExtendedParameterAddressRequirements
+    type::UInt64
+    pointer::Ptr{MemAddressRequirements}
+end
+
+function Base.convert(::Type{_MemExtendedParameterAddressRequirements}, p::MemExtendedParameterAddressRequirements)
+    r = Ref(p)
+    _MemExtendedParameterAddressRequirements(p.type, pointer_from_objref(p.requirements))
+end
 
 #=
 LPVOID VirtualAllocEx(
@@ -53,8 +84,10 @@ PVOID VirtualAlloc2(
   [in]                ULONG                  ParameterCount
 );
 =#
+# https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualalloc2
 function VirtualAlloc2(Process, BaseAddress, Size, AllocationType, PageProtection, ExtendedParameters, ParameterCount)
-    ccall((:VirtualAlloc2, kernel32), Ptr{Nothing},
+    # Docs say 
+    ccall((:VirtualAlloc2, kernelbase), Ptr{Nothing},
           (Ptr{Nothing}, Ptr{Nothing}, Csize_t, Culong, Culong, Ptr{Nothing}, Culong),
           Process, BaseAddress, Size, AllocationType, PageProtection, ExtendedParameters, ParameterCount
          )
@@ -63,6 +96,23 @@ function VirtualAlloc2(Process, BaseAddress, Size, AllocationType, PageProtectio
     VirtualAlloc2(Process, BaseAddress, Size, AllocationType, PageProtection, C_NULL, ParameterCount)
 end
 
+
+function win_memalign(alignment, num_bytes; lowestStartingAddress::Ptr{Nothing} = C_NULL, highestStartingAddress::Ptr{Nothing} = C_NULL)
+    reqs = MemAddressRequirements(lowestStartingAddress, highestStartingAddress, alignment)
+    pr = MemExtendedParameterAddressRequirements(reqs)
+    p = Ref{_MemExtendedParameterAddressRequirements}(pr)
+    GC.@preserve reqs pr p begin
+        ptr = VirtualAlloc2(hCurrentProcess, C_NULL, num_bytes, MEM_COMMIT_RESERVE, PAGE_READWRITE, p, 1)
+    end
+    return ptr
+end
+
+const MIN_ALIGNMENT = 2^16
+function check_alignment(alignment)
+    ispow2(alignment) || throw(ArgumentError("Alignment must be a power of 2"))
+    alignment ≥ MIN_ALIGNMENT || throw(ArgumentError("Alignment must be a multiple of $(MIN_ALIGNMENT)"))
+    return nothing
+end
 
 #=
 BOOL VirtualFreeEx(
@@ -99,14 +149,39 @@ function wrap_virtual(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray
 end
 wrap_virtual(ptr::Ptr{T}, dims) where T = wrap_virtual(Array{T}, ptr, dims)
 
+# == AbstractWinVirtualAllocator == #
+
 abstract type AbstractWinVirtualAllocator{B} <: AbstractArrayAllocator{B} end
 allocate(::AbstractWinVirtualAllocator, num_bytes) =  VirtualAllocEx(num_bytes)
 Base.unsafe_wrap(::AbstractWinVirtualAllocator, args...) = wrap_virtual(args...)
+
+# == WinVirtualAllocator == #
 
 struct WinVirtualAllocator{B} <: AbstractWinVirtualAllocator{B}
 end
 WinVirtualAllocator() = WinVirtualAllocator{DefaultByteCalculator}()
 
 const virtual = WinVirtualAllocator()
+
+# == WindowsMemAlign == #
+
+struct WinMemAlign{B} <: AbstractMemAlign{B}
+    alignment::Int
+    lowestStartingAddress::Ptr{Nothing}
+    highestStartingAddress::Ptr{Nothing}
+    function WinMemAlign{B}(alignment, lowestStartingAddress = C_NULL, highestStartingAddress = C_NULL) where B
+        check_alignment(alignment)
+        return new{B}(
+            alignment,
+            reinterpret(Ptr{Nothing}, lowestStartingAddress),
+            reinterpret(Ptr{Nothing}, highestStartingAddress)
+        )
+    end
+end
+WinMemAlign() = WinMemAlign(MIN_ALIGNMENT)
+allocate(alloc::WinMemAlign, num_bytes) = win_memalign(alloc.alignment, num_bytes; alloc.lowestStartingAddress, alloc.highestStartingAddress)
+Base.unsafe_wrap(::WinMemAlign, args...) =  wrap_virtual(args...)
+alignment(alloc::WinMemAlign) = alloc.alignment
+
 
 end # module Windows

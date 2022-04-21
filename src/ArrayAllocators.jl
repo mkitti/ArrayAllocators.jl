@@ -37,6 +37,7 @@ end
 function allocate(alloc::AbstractArrayAllocator, ::Type{T}, num_bytes) where T
     return Ptr{T}(allocate(alloc, num_bytes))
 end
+(::Type{A})(args...) where A <: AbstractArrayAllocator = A{DefaultByteCalculator}(args...)
 
 
 """
@@ -133,14 +134,24 @@ const calloc = CallocAllocator()
 
 Allocate aligned memory. Alias for platform specific implementations.
 
-`alignment` must be a power of 2 and larger than `sizeof(Int)`
+`alignment` must be a power of 2.
+
+On POSIX systems, `alignment` must be a multiple of `sizeof(Ptr)`.
+On Windows, `alignment` must be a multiple of 2^16.
 
 POSIX (Linux and macOS): [`PosixMemAlign`](@ref)
+Windows: [`WinMemAlign`](@ref)
 """
 MemAlign
 
+
+abstract type AbstractMemAlign{B} <: AbstractArrayAllocator{B} end
+alignment(alloc::AbstractMemAlign) = alloc.alignment
+
 @static if Sys.iswindows()
     include("Windows.jl")
+    import .Windows: WinMemAlign
+    const MemAlign = WinMemAlign
 end
 
 @static if Sys.isunix()
