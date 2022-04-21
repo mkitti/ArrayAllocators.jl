@@ -1,6 +1,6 @@
 module Windows
 
-import ..ArrayAllocators: AbstractArrayAllocator, DefaultByteCalculator, nbytes, allocate
+import ..ArrayAllocators: AbstractArrayAllocator, nbytes, allocate
 import ..ArrayAllocators: AbstractMemAlign, min_alignment, alignment
 import Base: Array
 
@@ -159,7 +159,6 @@ Base.unsafe_wrap(::AbstractWinVirtualAllocator, args...) = wrap_virtual(args...)
 
 struct WinVirtualAllocator{B} <: AbstractWinVirtualAllocator{B}
 end
-WinVirtualAllocator() = WinVirtualAllocator{DefaultByteCalculator}()
 
 const virtual = WinVirtualAllocator()
 

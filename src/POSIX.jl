@@ -1,6 +1,6 @@
 module POSIX
 
-using ..ArrayAllocators: AbstractArrayAllocator, wrap_libc_pointer, DefaultByteCalculator, LibcArrayAllocator
+using ..ArrayAllocators: AbstractArrayAllocator, wrap_libc_pointer, LibcArrayAllocator
 import ..ArrayAllocators: AbstractMemAlign, min_alignment, alignment
 import ..ArrayAllocators: allocate
 export MemAlign
@@ -49,7 +49,6 @@ struct PosixMemAlign{B} <: AbstractMemAlign{B}
 end
 
 PosixMemAlign() = PosixMemAlign(MIN_ALIGNMENT)
-PosixMemAlign(alignment) = PosixMemAlign{DefaultByteCalculator}(alignment)
 Base.unsafe_wrap(::PosixMemAlign, args...) = wrap_libc_pointer(args...)
 min_alignment(::PosixMemAlign) = MIN_ALIGNMENT
 

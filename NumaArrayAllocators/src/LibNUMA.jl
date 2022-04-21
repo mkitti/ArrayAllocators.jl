@@ -1,7 +1,7 @@
 module LibNUMA
 
 using ..NumaArrayAllocators: AbstractNumaAllocator
-import ArrayAllocators: AbstractArrayAllocator, DefaultByteCalculator, nbytes, allocate
+import ArrayAllocators: AbstractArrayAllocator, nbytes, allocate
 using NUMA_jll
 
 const libnuma = NUMA_jll.libnuma
@@ -37,7 +37,6 @@ struct LibNumaAllocator{B} <: AbstractLibNumaAllocator{B}
     node::Cint
 end
 
-LibNumaAllocator(node) = LibNumaAllocator{DefaultByteCalculator}(node)
 function allocate(n::LibNumaAllocator, num_bytes)
     return numa_alloc_onnode(num_bytes, n.node)
 end

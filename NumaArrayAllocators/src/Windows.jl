@@ -1,7 +1,7 @@
 module Windows
 
 using ..NumaArrayAllocators: AbstractNumaAllocator
-import ArrayAllocators: DefaultByteCalculator, allocate
+import ArrayAllocators: allocate
 using ArrayAllocators.ByteCalculators: nbytes
 using ArrayAllocators.Windows: wrap_virtual, hCurrentProcess, MEM_COMMIT_RESERVE, PAGE_READWRITE, kernel32
 
@@ -31,7 +31,6 @@ abstract type AbstractWinNumaAllocator{B} <: AbstractNumaAllocator{B} end
 struct WinNumaAllocator{B} <: AbstractWinNumaAllocator{B}
     node::Int
 end
-WinNumaAllocator(node) = WinNumaAllocator{DefaultByteCalculator}(node)
 
 function allocate(n::WinNumaAllocator, num_bytes)
     return VirtualAllocExNuma(num_bytes, n.node)

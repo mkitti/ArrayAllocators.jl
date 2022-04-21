@@ -47,7 +47,6 @@ Allocate arrays using the builtin `undef` method. The `B` parameter is a `ByteCa
 """
 struct UndefArrayAllocator{B} <: AbstractArrayAllocator{B}
 end
-UndefArrayAllocator() = UndefArrayAllocator{DefaultByteCalculator}()
 allocate(::UndefArrayAllocator, num_bytes) = C_NULL
 Base.unsafe_wrap(::UndefArrayAllocator, ::Type{ArrayType}, ::Ptr, dims::Dims) where {T, ArrayType <: AbstractArray{T}} = ArrayType(Core.undef, dims)
 
@@ -82,7 +81,6 @@ struct MallocAllocator{B} <: LibcArrayAllocator{B}
 end
 allocate(::MallocAllocator, num_bytes) = Libc.malloc(num_bytes)
 
-MallocAllocator() = MallocAllocator{DefaultByteCalculator}()
 
 """
     malloc
@@ -111,7 +109,6 @@ end
 allocate(::CallocAllocator, num_bytes) = Libc.calloc(num_bytes, 1)
 
 
-CallocAllocator() = CallocAllocator{DefaultByteCalculator}()
 
 """
     calloc
