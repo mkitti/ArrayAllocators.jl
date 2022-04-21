@@ -1,6 +1,7 @@
 module POSIX
 
-using ..ArrayAllocators: AbstractArrayAllocator, wrap_libc_pointer, DefaultByteCalculator, LibcArrayAllocator, AbstractMemAlign
+using ..ArrayAllocators: AbstractArrayAllocator, wrap_libc_pointer, DefaultByteCalculator, LibcArrayAllocator
+import ..ArrayAllocators: AbstractMemAlign, min_alignment, alignment
 import ..ArrayAllocators: allocate
 export MemAlign
 
@@ -50,6 +51,7 @@ end
 PosixMemAlign() = PosixMemAlign(MIN_ALIGNMENT)
 PosixMemAlign(alignment) = PosixMemAlign{DefaultByteCalculator}(alignment)
 Base.unsafe_wrap(::PosixMemAlign, args...) = wrap_libc_pointer(args...)
+min_alignment(::PosixMemAlign) = MIN_ALIGNMENT
 
 function allocate(alloc::PosixMemAlign{B}, ::Type{T}, num_bytes) where {B, T}
     isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))

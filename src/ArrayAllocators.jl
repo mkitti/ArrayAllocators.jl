@@ -145,8 +145,26 @@ Windows: [`WinMemAlign`](@ref)
 MemAlign
 
 
+"""
+    AbstractMemAlign{B} <: AbstractArrayAllocator{B}
+
+Abstract supertype for aligned memory allocators.
+"""
 abstract type AbstractMemAlign{B} <: AbstractArrayAllocator{B} end
+
+"""
+    alignment(alloc::AbstractMemAlign)
+
+Get byte alignment of the AbstractMemAlign array allocator.
+"""
 alignment(alloc::AbstractMemAlign) = alloc.alignment
+
+"""
+    min_alignment(::AbstractMemAlign)
+
+Get the minimum byte alignment of the AbstractMemAlign array allocator.
+"""
+function min_alignment() end
 
 @static if Sys.iswindows()
     include("Windows.jl")
