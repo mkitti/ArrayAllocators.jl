@@ -52,5 +52,7 @@ jobs:
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
             using ArrayAllocators
+            using SafeByteCalculators
+            using NumaAllocators
             DocMeta.setdocmeta!(ArrayAllocators, :DocTestSetup, :(using ArrayAllocators); recursive=true)
             doctest(ArrayAllocators)'
