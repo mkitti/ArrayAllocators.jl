@@ -14,7 +14,7 @@ the discussion below for further details.
 
 Other examples of specialized array allocation techniques include aligned memory on POSIX systems or virtual allocations on Windows systems.
 
-Multiple processor socket systems may also implement Non-Uniform Memory Access (NUMA) memory architecture. To optimally use the NUMA architecture, memory must be explicitly allocated on a specific NUMA node. The subpackage [NumaArrayAllocators.jl](NumaArrayAllocators) implements this functionality for Windows and Linux operating systems.
+Multiple processor socket systems may also implement Non-Uniform Memory Access (NUMA) memory architecture. To optimally use the NUMA architecture, memory must be explicitly allocated on a specific NUMA node. The subpackage [NumaAllocators.jl](NumaAllocators) implements this functionality for Windows and Linux operating systems.
 
 `AbstractArrayAllocator` can be provided as first argument when constructing any subtype of `AbstractArray` where `undef` is usually provided.
 
@@ -48,7 +48,7 @@ julia> @time Array{UInt8}(NumaAllocator(0), 2048, 2048);
 
 ## Subpackages
 
-* [NumaArrayAllocators.jl](NumaArrayAllocators): Allocate memory on Non-Uniform Memory Access (NUMA) nodes
+* [NumaAllocators.jl](NumaAllocators): Allocate memory on Non-Uniform Memory Access (NUMA) nodes
 * [SafeByteCaculators.jl](SafeByteCalculators): Implement byte calculations using SaferIntegers.jl to detect integer overflow. Note that a form of integer overflow detection is implemented in ArrayAllocators.jl itself. This package just provides an alternative implementation.
 
 ## Discussion

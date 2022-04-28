@@ -1,7 +1,21 @@
+"""
+    ArrayAllocators.Windows
+
+Defines array allocators on Windows.
+
+# Examples
+
+```julia
+using ArrayAllocators.Windows
+
+Array{UInt8}(WinMemAlign(2^16), 1024)
+```
+"""
 module Windows
 
 import ..ArrayAllocators: AbstractArrayAllocator, nbytes, allocate
 import ..ArrayAllocators: AbstractMemAlign, min_alignment, alignment
+import ..ArrayAllocators: iszeroinit
 import Base: Array
 
 export WinMemAlign
@@ -29,6 +43,11 @@ const DWORD = Culong
 
 abstract type MemExtendedParameterType end
 
+"""
+    MemAddressRequirements
+
+See https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-mem_address_requirements
+"""
 struct MemAddressRequirements
     lowestStartingAddress::Ptr{Nothing}
     highestStartingAddress::Ptr{Nothing}
@@ -36,6 +55,15 @@ struct MemAddressRequirements
 end
 MemAddressRequirements(alignment) = MemAddressRequirements(C_NULL, C_NULL, alignment)
 
+"""
+    MemExtendedParameterAddressRequirements
+
+This is a Julian structure where the `requirements` field is `Base.RefValue{MemAddressRequirements}`
+
+See https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-mem_extended_parameter
+
+See also `_MemExtendedParameterAddressRequirements`
+"""
 struct MemExtendedParameterAddressRequirements <: MemExtendedParameterType
     type::UInt64
     requirements::Base.RefValue{MemAddressRequirements}
@@ -44,13 +72,19 @@ struct MemExtendedParameterAddressRequirements <: MemExtendedParameterType
     end
 end
 
+"""
+    _MemExtendedParameterAddressRequirements
+
+Internal structure compatible with C definition
+
+See https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-mem_extended_parameter
+"""
 struct _MemExtendedParameterAddressRequirements
     type::UInt64
     pointer::Ptr{MemAddressRequirements}
 end
 
 function Base.convert(::Type{_MemExtendedParameterAddressRequirements}, p::MemExtendedParameterAddressRequirements)
-    r = Ref(p)
     _MemExtendedParameterAddressRequirements(p.type, pointer_from_objref(p.requirements))
 end
 
@@ -154,6 +188,7 @@ wrap_virtual(ptr::Ptr{T}, dims) where T = wrap_virtual(Array{T}, ptr, dims)
 abstract type AbstractWinVirtualAllocator{B} <: AbstractArrayAllocator{B} end
 allocate(::AbstractWinVirtualAllocator, num_bytes) =  VirtualAllocEx(num_bytes)
 Base.unsafe_wrap(::AbstractWinVirtualAllocator, args...) = wrap_virtual(args...)
+iszeroinit(::Type{A}) where A <: AbstractWinVirtualAllocator = true
 
 # == WinVirtualAllocator == #
 
@@ -164,6 +199,11 @@ const virtual = WinVirtualAllocator()
 
 # == WindowsMemAlign == #
 
+"""
+    WinMemAlign([alignment, lowestStartingAddress, highestStartingAddress])
+
+Uses `VirtualAlloc2` to allocate aligned memory. `alignment` must be a power of 2 and larger than $(MIN_ALIGNMENT).
+"""
 struct WinMemAlign{B} <: AbstractMemAlign{B}
     alignment::Int
     lowestStartingAddress::Ptr{Nothing}
@@ -180,7 +220,8 @@ end
 WinMemAlign() = WinMemAlign(MIN_ALIGNMENT)
 allocate(alloc::WinMemAlign, num_bytes) = win_memalign(alloc.alignment, num_bytes; alloc.lowestStartingAddress, alloc.highestStartingAddress)
 Base.unsafe_wrap(::WinMemAlign, args...) =  wrap_virtual(args...)
-min_alignment(::WinMemAlign) = MIN_ALIGNMENT
+min_alignment(::Type{WinMemAlign}) = MIN_ALIGNMENT
+iszeroinit(::Type{A}) where A <: WinMemAlign = true
 
 
 end # module Windows

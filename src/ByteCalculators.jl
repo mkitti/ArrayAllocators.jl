@@ -1,3 +1,18 @@
+"""
+    ArrayAllocators.ByteCalculators
+
+Defines calculators for computing the number of bytes needed to allocate an array while detecting integer overflow.
+
+# Examples
+
+```julia
+using ArrayAllocators.ByteCalculators
+
+bc = CheckedMulByteCalculator{UInt8}(1024, 2048)
+elsize(bc)
+nbytes(bc)
+```
+"""
 module ByteCalculators
 
 export nbytes, elsize
@@ -14,7 +29,7 @@ abstract type AbstractByteCalculator{T} end
 function (::Type{B})(dims::Int...) where {T, B <: AbstractByteCalculator{T}}
     return B(dims)
 end
-elsize(::AbstractByteCalculator{T}) where T = sizeof(T)
+elsize(::AbstractByteCalculator{T}) where T = isbitstype(T) ? sizeof(T) : sizeof(Ptr)
 nbytes(b::AbstractByteCalculator{T}) where T = elsize(b) * length(b)
 
 """

@@ -1,3 +1,20 @@
+"""
+    ArrayAllocators
+
+Defines an array allocator interface and concrete array allocators using `malloc`, `calloc`, and memory alignment.
+
+# Examples
+
+```julia
+using ArrayAllocators
+
+Array{UInt8}(malloc, 100)
+Array{UInt8}(calloc, 1024, 1024)
+Array{UInt8}(MemAlign(2^16), (1024, 1024, 16))
+```
+
+See also `NumaAllocators`, `SafeByteCalculators`
+"""
 module ArrayAllocators
 
 
@@ -11,7 +28,7 @@ using .ByteCalculators
 
 const DefaultByteCalculator = CheckedMulByteCalculator
 
-export AbstractArrayAllocator, UndefArrayAllocator, MallocAllocator, CallocAllocator
+export AbstractArrayAllocator, UndefAllocator, MallocAllocator, CallocAllocator
 export MemAlign
 
 
@@ -34,21 +51,23 @@ function (::Type{ArrayType})(alloc::A, dims) where {T, ArrayType <: AbstractArra
     return unsafe_wrap(alloc, ArrayType, ptr, dims)
 end
 
-function allocate(alloc::AbstractArrayAllocator, ::Type{T}, num_bytes) where T
+function allocate(alloc::A, ::Type{T}, num_bytes) where {A <: AbstractArrayAllocator, T}
+    iszeroinit(A) || isbitstype(T) || throw(ArgumentError("$T is not a bitstype"))
     return Ptr{T}(allocate(alloc, num_bytes))
 end
 (::Type{A})(args...) where A <: AbstractArrayAllocator = A{DefaultByteCalculator}(args...)
+iszeroinit(::Type{A}) where A <: AbstractArrayAllocator = false
 
 
 """
-    UndefArrayAllocator{B}
+    UndefAllocator{B}
 
 Allocate arrays using the builtin `undef` method. The `B` parameter is a `ByteCalculator`
 """
-struct UndefArrayAllocator{B} <: AbstractArrayAllocator{B}
+struct UndefAllocator{B} <: AbstractArrayAllocator{B}
 end
-allocate(::UndefArrayAllocator, num_bytes) = C_NULL
-Base.unsafe_wrap(::UndefArrayAllocator, ::Type{ArrayType}, ::Ptr, dims::Dims) where {T, ArrayType <: AbstractArray{T}} = ArrayType(Core.undef, dims)
+allocate(::UndefAllocator, num_bytes) = C_NULL
+Base.unsafe_wrap(::UndefAllocator, ::Type{ArrayType}, ::Ptr, dims::Dims) where {T, ArrayType <: AbstractArray{T}} = ArrayType(Core.undef, dims)
 
 abstract type LibcArrayAllocator{B} <: AbstractArrayAllocator{B} end
 
@@ -73,9 +92,11 @@ Base.unsafe_wrap(alloc::A, args...) where A <: LibcArrayAllocator = wrap_libc_po
 """
     MallocAllocator()
 
-Allocate array using `Libc.malloc`. This is not meant to be useful
+Allocate array using [`Libc.malloc`](https://docs.julialang.org/en/v1/base/libc/#Base.Libc.malloc). This is not meant to be useful
 but rather just to prototype the concept for a custom array allocator
 concept. This should be similar to using `undef`.
+
+See also https://en.cppreference.com/w/c/memory/malloc .
 """
 struct MallocAllocator{B} <: LibcArrayAllocator{B}
 end
@@ -85,7 +106,8 @@ allocate(::MallocAllocator, num_bytes) = Libc.malloc(num_bytes)
 """
     malloc
 
-MallocAllocator singleton.
+[`MallocAllocator`](@ref) singleton instance. `malloc` will only allocate memory. It does not initialize memory is is similar
+in use as `undef`. See the type and the [C standard library function](https://en.cppreference.com/w/c/memory/malloc) for details.
 
 # Example
 
@@ -100,20 +122,23 @@ const malloc = MallocAllocator()
 """
     CallocAllocator()
 
-Use Libc.calloc to allocate an array. This is similar to `zeros`, except
+Use [`Libc.calloc`](https://docs.julialang.org/en/v1/base/libc/#Base.Libc.calloc) to allocate an array. This is similar to `zeros`, except
 that the Libc implementation or the operating system may allocate and
 zero the memory in a lazy fashion.
+
+See also https://en.cppreference.com/w/c/memory/calloc .
 """
 struct CallocAllocator{B} <: LibcArrayAllocator{B}
 end
 allocate(::CallocAllocator, num_bytes) = Libc.calloc(num_bytes, 1)
-
+iszeroinit(::Type{A}) where A <: CallocAllocator = true
 
 
 """
     calloc
 
-CallocAllocator singleton.
+[`CallocAllocator`](@ref) singleton instance. `calloc` will allocate memory and guarantee initialization to `0`.
+See the type for details and the [C standard library function](https://en.cppreference.com/w/c/memory/calloc) for further details.
 
 # Example
 
@@ -127,7 +152,7 @@ julia> sum(A)
 const calloc = CallocAllocator()
 
 """
-    MemAlign(alignment::Integer)
+    MemAlign([alignment::Integer])
 
 Allocate aligned memory. Alias for platform specific implementations.
 
@@ -136,8 +161,13 @@ Allocate aligned memory. Alias for platform specific implementations.
 On POSIX systems, `alignment` must be a multiple of `sizeof(Ptr)`.
 On Windows, `alignment` must be a multiple of 2^16.
 
-POSIX (Linux and macOS): [`PosixMemAlign`](@ref)
-Windows: [`WinMemAlign`](@ref)
+If `alignment` is not specified, it will be set to `min_alignment(MemAlign)`.
+
+`MemAlign` is a constant alias for one the following platform specific implementations.
+* POSIX (Linux and macOS): [`POSIX.PosixMemAlign`](@ref)
+* Windows: [`Windows.WinMemAlign`](@ref).
+
+
 """
 MemAlign
 
@@ -163,15 +193,15 @@ Get the minimum byte alignment of the AbstractMemAlign array allocator.
 """
 function min_alignment() end
 
-@static if Sys.iswindows()
-    include("Windows.jl")
-    import .Windows: WinMemAlign
-    const MemAlign = WinMemAlign
-end
+include("Windows.jl")
+include("POSIX.jl")
 
-@static if Sys.isunix()
-    include("POSIX.jl")
-    import .POSIX: PosixMemAlign
+import .Windows: WinMemAlign
+import .POSIX: PosixMemAlign
+
+@static if Sys.iswindows()
+    const MemAlign = WinMemAlign
+elseif Sys.isunix()
     const MemAlign = PosixMemAlign
 end
 
