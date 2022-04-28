@@ -1,3 +1,10 @@
+"""
+    NumaAllocators.Windows
+
+NUMA support for Windows.
+
+See also https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualallocexnuma
+"""
 module Windows
 
 using ..NumaAllocators: AbstractNumaAllocator
@@ -28,6 +35,13 @@ end
 
 abstract type AbstractWinNumaAllocator{B} <: AbstractNumaAllocator{B} end
 
+"""
+    WinNumaAllocator
+
+Allocate memory on a specific NUMA node with `VirtualAllocExNuma`.
+
+See also https://docs.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualallocexnuma
+"""
 struct WinNumaAllocator{B} <: AbstractWinNumaAllocator{B}
     node::Int
 end

@@ -24,14 +24,14 @@ export NumaAllocator, numa
 
 abstract type AbstractNumaAllocator{B} <: AbstractArrayAllocator{B} end
 
+include("Windows.jl")
+include("LibNUMA.jl")
 
 @static if Sys.iswindows()
-    include("Windows.jl")
     import .Windows: WinNumaAllocator
 
     const NumaAllocator = WinNumaAllocator
 elseif ( VERSION >= v"1.6" && NUMA_jll.is_available() ) || isdefined(NUMA_jll, :libnuma)
-    include("LibNUMA.jl")
     import .LibNUMA: LibNumaAllocator
 
     const NumaAllocator = LibNumaAllocator
