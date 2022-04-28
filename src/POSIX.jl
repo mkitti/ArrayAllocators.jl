@@ -36,7 +36,7 @@ function posix_memalign(alignment, num_bytes)
     ptr = Ref{Ptr{Cvoid}}()
     err = ccall(:posix_memalign, Cint, (Ref{Ptr{Cvoid}}, Csize_t, Csize_t), ptr, alignment, num_bytes)
     iszero(err) || throw(OutOfMemoryError())
-    return ptr
+    return ptr[]
 end
 
 """
