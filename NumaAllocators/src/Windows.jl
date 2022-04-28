@@ -1,7 +1,7 @@
 module Windows
 
-using ..NumaArrayAllocators: AbstractNumaAllocator
-import ArrayAllocators: allocate
+using ..NumaAllocators: AbstractNumaAllocator
+import ArrayAllocators: allocate, iszeroinit
 using ArrayAllocators.ByteCalculators: nbytes
 using ArrayAllocators.Windows: wrap_virtual, hCurrentProcess, MEM_COMMIT_RESERVE, PAGE_READWRITE, kernel32
 
@@ -36,5 +36,6 @@ function allocate(n::WinNumaAllocator, num_bytes)
     return VirtualAllocExNuma(num_bytes, n.node)
 end
 Base.unsafe_wrap(::WinNumaAllocator, args...) = wrap_virtual(args...)
+iszeroinit(::Type{A}) where A <: WinNumaAllocator = true
 
 end # module Windows

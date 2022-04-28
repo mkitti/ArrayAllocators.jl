@@ -1,3 +1,7 @@
+```@meta
+CurrentModule = ArrayAllocators.ByteCalculators
+```
+
 # ByteCalculators
 
 Byte calculators perform the task of computing the total number of bytes to calculate. In doing so, they try to detect integer overflow conditions.
@@ -19,9 +23,33 @@ Stacktrace:
 [...]
 ```
 
-```@index
+## Default Byte Calculator
+
+```@docs
+CheckedMulByteCalculator
 ```
 
-```@autodocs
-Modules = [ArrayAllocators.ByteCalculators, SafeByteCalculators]
+## Alternative Byte Calculators
+
+```@docs
+WideningByteCalculator
+UnsafeByteCalculator
+```
+
+
+```@meta
+CurrentModule = SafeByteCalculators
+```
+
+```@docs
+SafeByteCalculators.SafeByteCalculator
+```
+
+```@meta
+CurrentModule = ArrayAllocators.ByteCalculators
+```
+
+## Abstract Type
+```@docs
+AbstractByteCalculator
 ```

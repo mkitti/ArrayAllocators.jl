@@ -116,9 +116,9 @@ version = "2.0.14+0"
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
-[[deps.NumaArrayAllocators]]
+[[deps.NumaAllocators]]
 deps = ["ArrayAllocators", "NUMA_jll"]
-path = "../NumaArrayAllocators"
+path = "../NumaAllocators"
 uuid = "21436f30-1b4a-4f08-87af-e26101bb5379"
 version = "0.1.0"
 

@@ -4,10 +4,10 @@ using ArrayAllocators.ByteCalculators
 using Test
 
 # Load in subpackages
-Pkg.develop(PackageSpec(path=joinpath(dirname(@__DIR__), "./NumaArrayAllocators")))
+Pkg.develop(PackageSpec(path=joinpath(dirname(@__DIR__), "./NumaAllocators")))
 Pkg.develop(PackageSpec(path=joinpath(dirname(@__DIR__), "./SafeByteCalculators")))
 
-using NumaArrayAllocators
+using NumaAllocators
 using SafeByteCalculators
 
 @testset "ArrayAllocators.jl" begin
@@ -30,7 +30,7 @@ using SafeByteCalculators
         @test size(WV) == (64, 1024)
         @test WV == zeros(UInt8, 64, 1024)
     end
-    if isdefined(NumaArrayAllocators, :NumaAllocator)
+    if isdefined(NumaAllocators, :NumaAllocator)
         C = Array{UInt8}(NumaAllocator(0), 2048, 2048);
         @test A == C
     end

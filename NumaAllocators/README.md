@@ -1,4 +1,4 @@
-# NumaArrayAllocators.jl
+# NumaAllocators.jl
 
 Extends ArrayAllocators.jl to handle Non-Uniform Memory Access (NUMA) allocation on Windows and Linux.
 See the ArrayAllocators.jl documentation for more information.

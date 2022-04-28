@@ -1,4 +1,18 @@
-module NumaArrayAllocators
+"""
+    NumaAllocators
+
+Extends `ArrayAllocators` to allocate memory on specific NUMA nodes.
+
+# Examples
+
+```julia
+using NumaAllocators
+
+Array{UInt8}(numa(0), 100)
+Array{UInt8}(NumaAllocator(1), 100)
+```
+"""
+module NumaAllocators
 
 @static if VERSION >= v"1.3"
     using NUMA_jll
@@ -9,21 +23,6 @@ using ArrayAllocators: AbstractArrayAllocator
 export NumaAllocator, numa
 
 abstract type AbstractNumaAllocator{B} <: AbstractArrayAllocator{B} end
-
-"""
-    NumaAllocator(node)
-
-Cross-platform NUMA allocator
-
-# Example
-
-```jldoctest
-julia> Array{UInt8}(NumaAllocator(0), 32, 32)
-32×32 Matrix{UInt8}:
-...
-```
-"""
-NumaAllocator
 
 
 @static if Sys.iswindows()
@@ -38,21 +37,40 @@ elseif ( VERSION >= v"1.6" && NUMA_jll.is_available() ) || isdefined(NUMA_jll, :
     const NumaAllocator = LibNumaAllocator
 end
 
-"""
-    numa(node)
+if @isdefined(NumaAllocator)
+    numa(node) = NumaAllocator(node)
+end
 
-Create a `NumaAllocator` on NUMA node `node`. Short hand for `NumaAllocator` constructor.
+"""
+    NumaAllocator(node)
+
+Cross-platform NUMA allocator
 
 # Example
 
 ```jldoctest
+julia> using NumaAllocators
+
+julia> Array{UInt8}(NumaAllocator(0), 32, 32);
+```
+"""
+NumaAllocator
+
+"""
+    numa(node)
+
+Create a `NumaAllocator` on NUMA node `node`. Short hand for [`NumaAllocator`](@ref) constructor.
+
+# Example
+
+```jldoctest
+julia> using NumaAllocators
+
 julia> Array{UInt8}(numa(0), 32, 32);
 ```
 """
 numa
 
-if @isdefined(NumaAllocator)
-    numa(node) = NumaAllocator(node)
-end
+
 
 end

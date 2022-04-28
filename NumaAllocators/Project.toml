@@ -1,4 +1,4 @@
-name = "NumaArrayAllocators"
+name = "NumaAllocators"
 uuid = "21436f30-1b4a-4f08-87af-e26101bb5379"
 authors = ["Mark Kittisopikul <kittisopikulm@janelia.hhmi.org> and contributors"]
 version = "0.1.0"

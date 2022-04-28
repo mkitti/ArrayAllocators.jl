@@ -1,4 +1,8 @@
-# NumaArrayAllocators
+```@meta
+CurrentModule = NumaAllocators
+```
+
+# NumaAllocators
 
 Non-Uniform Memory Access (NUMA) array allocators allow you to allocate memory on specific NUMA nodes.
 
@@ -7,6 +11,8 @@ Non-Uniform Memory Access (NUMA) array allocators allow you to allocate memory o
 A `NumaAllocator` can be instantiated via `numa(node)` and passed to the `Array` constructor as below.
 
 ```julia
+julia> using NumaAllocators
+
 julia> a0 = Array{Int8}(numa(0), 1024, 1024);
 
 julia> b0 = Array{Int8}(numa(0), 1024, 1024);
@@ -58,8 +64,9 @@ Platform Info:
 In the example above, copying 1 MB of data from NUMA node 0 to NUMA node 1 is faster than copying between
 memory local to either NUMA node or copying data from NUMA node 1 to NUMA node 0.
 
-## Details
+## Interface 
 
-```@autodocs
-Modules = [NumaArrayAllocators]
+```@docs
+numa
+NumaAllocator
 ```

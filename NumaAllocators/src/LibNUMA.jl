@@ -1,6 +1,6 @@
 module LibNUMA
 
-using ..NumaArrayAllocators: AbstractNumaAllocator
+using ..NumaAllocators: AbstractNumaAllocator
 import ArrayAllocators: AbstractArrayAllocator, nbytes, allocate
 using NUMA_jll
 
