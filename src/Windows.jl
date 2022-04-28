@@ -223,7 +223,12 @@ struct WinMemAlign{B} <: AbstractMemAlign{B}
     end
 end
 WinMemAlign() = WinMemAlign(MIN_ALIGNMENT)
-allocate(alloc::WinMemAlign, num_bytes) = win_memalign(alloc.alignment, num_bytes; alloc.lowestStartingAddress, alloc.highestStartingAddress)
+allocate(alloc::WinMemAlign, num_bytes) = win_memalign(
+    alloc.alignment,
+    num_bytes;
+    lowestStartingAddress = alloc.lowestStartingAddress,
+    highestStartingAddress = alloc.highestStartingAddress
+)
 Base.unsafe_wrap(::WinMemAlign, args...) =  wrap_virtual(args...)
 min_alignment(::Type{WinMemAlign}) = MIN_ALIGNMENT
 iszeroinit(::Type{A}) where A <: WinMemAlign = true
