@@ -21,35 +21,13 @@ julia> nbytes(bc)
 ERROR: OverflowError: The product of array length and element size will cause an overflow.
 Stacktrace:
 [...]
-```
 
-## Default Byte Calculator
+julia> bc = ByteCalculators.UnsafeByteCalculator{UInt16}(typemax(Int))
+UnsafeByteCalculator{UInt16}((9223372036854775807,))
 
-```@docs
-CheckedMulByteCalculator
-```
+julia> length(bc)
+9223372036854775807
 
-## Alternative Byte Calculators
-
-```@docs
-WideningByteCalculator
-UnsafeByteCalculator
-```
-
-
-```@meta
-CurrentModule = SafeByteCalculators
-```
-
-```@docs
-SafeByteCalculators.SafeByteCalculator
-```
-
-```@meta
-CurrentModule = ArrayAllocators.ByteCalculators
-```
-
-## Abstract Type
-```@docs
-AbstractByteCalculator
+julia> nbytes(bc)
+-2
 ```

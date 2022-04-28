@@ -63,10 +63,3 @@ Platform Info:
 
 In the example above, copying 1 MB of data from NUMA node 0 to NUMA node 1 is faster than copying between
 memory local to either NUMA node or copying data from NUMA node 1 to NUMA node 0.
-
-## Interface 
-
-```@docs
-numa
-NumaAllocator
-```

@@ -36,6 +36,9 @@ using SafeByteCalculators
         D = Array{UInt8}(MemAlign(), 1024, 4096)
         @test size(D) == (1024, 4096)
         @test reinterpret(Int, pointer(D)) % ArrayAllocators.alignment(MemAlign()) == 0
+        E = Array{UInt8}(MemAlign(2^16), 1024, 2048)
+        @test size(E) == (1024, 2048)
+        @test reinterpret(Int, pointer(E)) % 2^16 == 0
     end
 
 end

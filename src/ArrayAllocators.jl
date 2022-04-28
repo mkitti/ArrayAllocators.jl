@@ -26,6 +26,13 @@ include("ByteCalculators.jl")
 
 using .ByteCalculators
 
+"""
+    DefaultByteCalculator
+
+Alias for [`ByteCalculators.CheckedMulByteCalculator`](@ref) representing the
+byte calculator used with subtypes of `AbstractArrayAllocator` when one is not
+specified.
+"""
 const DefaultByteCalculator = CheckedMulByteCalculator
 
 export AbstractArrayAllocator, UndefAllocator, MallocAllocator, CallocAllocator

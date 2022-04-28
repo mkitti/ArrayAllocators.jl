@@ -19,7 +19,12 @@ makedocs(;
         "Home" => "index.md",
         "Detailed Overview" => "detailed_overview.md",
         "Byte Calculators" => "bytecalculators.md",
-        "NUMA Array Allocators" => "numa.md"
+        "NUMA Allocators" => "numa.md",
+        "API" => [
+            "ArrayAllocators.jl" => "api.md",
+            "ArrayAllocators.ByteCalculators" => "bytecalculators_api.md",
+            "NumaAllocators.jl" => "numa_api.md",
+        ]
     ],
 )
 

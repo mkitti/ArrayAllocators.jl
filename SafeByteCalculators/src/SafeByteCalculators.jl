@@ -1,3 +1,8 @@
+"""
+    SafeByteCalculators
+
+Extension of [`ArrayAllocators.ByteCalculators`](@ref) using [SaferIntegers.jl](https://github.com/JeffreySarnoff/SaferIntegers.jl).
+"""
 module SafeByteCalculators
 
 import ArrayAllocators
