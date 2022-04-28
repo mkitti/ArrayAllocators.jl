@@ -54,5 +54,5 @@ jobs:
             using ArrayAllocators
             using SafeByteCalculators
             using NumaAllocators
-            DocMeta.setdocmeta!(ArrayAllocators, :DocTestSetup, :(using ArrayAllocators); recursive=true)
+            DocMeta.setdocmeta!(ArrayAllocators, :DocTestSetup, :(using ArrayAllocators, SafeByteCalculators, NumaAllocators); recursive=true)
             doctest(ArrayAllocators)'
