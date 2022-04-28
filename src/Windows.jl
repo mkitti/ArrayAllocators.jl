@@ -77,13 +77,13 @@ struct MemExtendedParameterAddressRequirements <: MemExtendedParameterType
     end
 end
 
-"""
+#=
     _MemExtendedParameterAddressRequirements
 
 Internal structure compatible with C definition
 
 See https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-mem_extended_parameter
-"""
+=#
 struct _MemExtendedParameterAddressRequirements
     type::UInt64
     pointer::Ptr{MemAddressRequirements}
@@ -146,10 +146,10 @@ function win_memalign(alignment, num_bytes; lowestStartingAddress::Ptr{Nothing} 
     return ptr
 end
 
-const MIN_ALIGNMENT = 2^16
+const WIN_MEMALIGN_MIN_ALIGNMENT = 2^16
 function check_alignment(alignment)
     ispow2(alignment) || throw(ArgumentError("Alignment must be a power of 2"))
-    alignment ≥ MIN_ALIGNMENT || throw(ArgumentError("Alignment must be a multiple of $(MIN_ALIGNMENT)"))
+    alignment ≥ WIN_MEMALIGN_MIN_ALIGNMENT || throw(ArgumentError("Alignment must be a multiple of $(WIN_MEMALIGN_MIN_ALIGNMENT)"))
     return nothing
 end
 
@@ -207,7 +207,7 @@ const virtual = WinVirtualAllocator()
 """
     WinMemAlign([alignment, lowestStartingAddress, highestStartingAddress])
 
-Uses `VirtualAlloc2` to allocate aligned memory. `alignment` must be a power of 2 and larger than $(MIN_ALIGNMENT).
+Uses `VirtualAlloc2` to allocate aligned memory. `alignment` must be a power of 2 and larger than $(WIN_MEMALIGN_MIN_ALIGNMENT).
 """
 struct WinMemAlign{B} <: AbstractMemAlign{B}
     alignment::Int
@@ -222,7 +222,7 @@ struct WinMemAlign{B} <: AbstractMemAlign{B}
         )
     end
 end
-WinMemAlign() = WinMemAlign(MIN_ALIGNMENT)
+WinMemAlign() = WinMemAlign(WIN_MEMALIGN_MIN_ALIGNMENT)
 allocate(alloc::WinMemAlign, num_bytes) = win_memalign(
     alloc.alignment,
     num_bytes;
@@ -230,7 +230,7 @@ allocate(alloc::WinMemAlign, num_bytes) = win_memalign(
     highestStartingAddress = alloc.highestStartingAddress
 )
 Base.unsafe_wrap(::WinMemAlign, args...) =  wrap_virtual(args...)
-min_alignment(::Type{WinMemAlign}) = MIN_ALIGNMENT
+min_alignment(::Type{WinMemAlign}) = WIN_MEMALIGN_MIN_ALIGNMENT
 iszeroinit(::Type{A}) where A <: WinMemAlign = true
 
 
