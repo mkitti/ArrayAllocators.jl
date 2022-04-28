@@ -25,18 +25,14 @@ using SafeByteCalculators
     @test_throws OverflowError Array{UInt16}(MallocAllocator{WideningByteCalculator}(), 2, typemax(Int64)÷2)
     @test_throws OverflowError Array{UInt16}(MallocAllocator{SafeByteCalculator}(), 2, typemax(Int64)÷2)
 
-    if isdefined(ArrayAllocators, :Windows)
+    @static if Sys.iswindows()
         WV = Array{UInt8}(ArrayAllocators.Windows.virtual, 64, 1024);
         @test size(WV) == (64, 1024)
         @test WV == zeros(UInt8, 64, 1024)
     end
-    if isdefined(NumaAllocators, :NumaAllocator)
+    @static if Sys.isunix() || Sys.iswindows()
         C = Array{UInt8}(NumaAllocator(0), 2048, 2048);
         @test A == C
-    end
-
-    if isdefined(ArrayAllocators, :MemAlign)
-        memalign = MemAlign()
         D = Array{UInt8}(memalign, 1024, 4096)
         @test size(D) == (1024, 4096)
         @test reinterpret(Int, pointer(D)) % ArrayAllocators.alignment(memalign) == 0
