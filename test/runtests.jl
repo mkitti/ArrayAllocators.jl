@@ -33,9 +33,9 @@ using SafeByteCalculators
     @static if Sys.isunix() || Sys.iswindows()
         C = Array{UInt8}(NumaAllocator(0), 2048, 2048);
         @test A == C
-        D = Array{UInt8}(memalign, 1024, 4096)
+        D = Array{UInt8}(MemAlign(), 1024, 4096)
         @test size(D) == (1024, 4096)
-        @test reinterpret(Int, pointer(D)) % ArrayAllocators.alignment(memalign) == 0
+        @test reinterpret(Int, pointer(D)) % ArrayAllocators.alignment(MemAlign()) == 0
     end
 
 end
