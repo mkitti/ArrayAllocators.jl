@@ -20,7 +20,12 @@ import Base: Array
 
 export WinMemAlign
 
-const hCurrentProcess = ccall((:GetCurrentProcess, "kernel32"), Ptr{Nothing}, ())
+@static if Sys.iswindows()
+    const hCurrentProcess = ccall((:GetCurrentProcess, "kernel32"), Ptr{Nothing}, ())
+else
+    # The value below is the typical default value on Windows when executing the above
+    const hCurrentProcess = Ptr{Nothing}(0xffffffffffffffff)
+end
 
 const kernel32 = "kernel32"
 const kernelbase = "kernelbase"
