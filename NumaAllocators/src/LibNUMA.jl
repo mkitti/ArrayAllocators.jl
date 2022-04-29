@@ -42,8 +42,12 @@ function numa_max_node()
     return ccall((:numa_max_node, libnuma), Cint, ())
 end
 
-function numa_node_of_cpu(cpu)
+function numa_node_of_cpu(cpu = sched_getcpu())
     return ccall((:numa_node_of_cpu, libnuma), Cint, (Cint,), cpu)
+end
+
+function sched_getcpu()
+    return ccall(:sched_getcpu, Cint, ())
 end
 
 function wrap_numa(::Type{ArrayType}, ptr::Ptr{T}, dims) where {T, ArrayType <: AbstractArray{T}}

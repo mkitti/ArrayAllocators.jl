@@ -21,6 +21,7 @@ end
 using ArrayAllocators: AbstractArrayAllocator
 
 export NumaAllocator, numa
+export current_numa_node, highest_numa_node
 
 abstract type AbstractNumaAllocator{B} <: AbstractArrayAllocator{B} end
 
@@ -71,6 +72,34 @@ julia> Array{UInt8}(numa(0), 32, 32);
 """
 numa
 
+"""
+    current_numa_node()::Int
 
+Returns the current NUMA node as an Int
+"""
+function current_numa_node()::Int
+    @static if Sys.iswindows()
+        return Int(Windows.GetNumaProcessorNode())
+    elseif Sys.islinux()
+        return Int(LibNUMA.numa_node_of_cpu())
+    else
+        error("current_numa_node is not implemented for this platform")
+    end
+end
+
+"""
+    highest_numa_node()::Int
+
+Returns the highest NUMA node as an Int
+"""
+function highest_numa_node()::Int
+    @static if Sys.iswindows()
+        return Int(Windows.GetNumaHighestNodeNumber())
+    elseif Sys.islinux()
+        return Int(LibNUMA.numa_max_node())
+    else
+        error("highest_numa_node is not implemented for this platform")
+    end
+end
 
 end

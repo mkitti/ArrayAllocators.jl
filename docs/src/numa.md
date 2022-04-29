@@ -49,6 +49,12 @@ julia> @time copyto!(b1, a1);
 julia> @time copyto!(b0, a1);
   0.000455 seconds
 
+julia> current_numa_node()
+0
+
+julia> highest_numa_node()
+1
+
 julia> versioninfo()
 Julia Version 1.7.2
 Commit bf53498635 (2022-02-06 15:21 UTC)

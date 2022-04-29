@@ -12,6 +12,29 @@ import ArrayAllocators: allocate, iszeroinit
 using ArrayAllocators.ByteCalculators: nbytes
 using ArrayAllocators.Windows: wrap_virtual, hCurrentProcess, MEM_COMMIT_RESERVE, PAGE_READWRITE, kernel32
 
+function GetNumaProcessorNode(processor = GetCurrentProcessorNumber())
+    node_number = Ref{Cuchar}(0)
+    status = ccall((:GetNumaProcessorNode, kernel32), Cint, (Cuchar, Ptr{Cuchar}), processor, node_number)
+    if status == 0
+        error("Could not retrieve NUMA node for processor $processor.")
+    end
+    return node_number[]
+end
+
+# https://docs.microsoft.com/en-us/windows/win32/api/systemtopologyapi/nf-systemtopologyapi-getnumahighestnodenumber
+function GetNumaHighestNodeNumber()
+    node_number = Ref{Culong}(0)
+    status = ccall((:GetNumaHighestNodeNumber, kernel32), Cint, (Ptr{Culong},), node_number)
+    if status == 0
+        error("Could not retrieve highest NUMA node.")
+    end
+    return node_number[]
+end
+
+function GetCurrentProcessorNumber()
+    return ccall((:GetCurrentProcessorNumber, "kernel32"), Cint, ())
+end
+
 #=
 LPVOID VirtualAllocExNuma(
   [in]           HANDLE hProcess,

@@ -13,6 +13,8 @@ NumaAllocators
 ```@docs
 numa
 NumaAllocator
+current_numa_node
+highest_numa_node
 ```
 
 ## Platform Specific Interface

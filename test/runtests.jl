@@ -30,9 +30,14 @@ using SafeByteCalculators
         @test size(WV) == (64, 1024)
         @test WV == zeros(UInt8, 64, 1024)
     end
-    @static if Sys.isunix() || Sys.iswindows()
+    @static if Sys.islinux() || Sys.iswindows()
         C = Array{UInt8}(NumaAllocator(0), 2048, 2048);
         @test A == C
+        @test current_numa_node() isa Int
+        @test highest_numa_node() isa Int
+    end
+
+    @static if Sys.isunix() || Sys.iswindows()
         D = Array{UInt8}(MemAlign(), 1024, 4096)
         @test size(D) == (1024, 4096)
         @test reinterpret(Int, pointer(D)) % ArrayAllocators.alignment(MemAlign()) == 0
