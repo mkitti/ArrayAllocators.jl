@@ -18,11 +18,13 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.0'
+          - '1.3'
           - '1.7'
           - 'nightly'
         os:
           - ubuntu-latest
+          - windows-latest
+          - macos-latest
         arch:
           - x64
     steps:
@@ -51,5 +53,7 @@ jobs:
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
             using ArrayAllocators
-            DocMeta.setdocmeta!(ArrayAllocators, :DocTestSetup, :(using ArrayAllocators); recursive=true)
+            using SafeByteCalculators
+            using NumaAllocators
+            DocMeta.setdocmeta!(ArrayAllocators, :DocTestSetup, :(using ArrayAllocators, SafeByteCalculators, NumaAllocators); recursive=true)
             doctest(ArrayAllocators)'

@@ -1,3 +1,5 @@
 [deps]
 ArrayAllocators = "c9d4266f-a5cb-439d-837c-c97b191379f5"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+NumaAllocators = "21436f30-1b4a-4f08-87af-e26101bb5379"
+SafeByteCalculators = "88ce4d4d-ee2f-4b4a-abd3-cbc3580a88f7"
