@@ -21,6 +21,13 @@ Multiple processor socket systems may also implement Non-Uniform Memory Access (
 Any C function that returns a pointer can be wrapped by the `AbstractArrayAllocator` interface by implementing the `allocate` method and overriding
 `Base.unsafe_wrap`.
 
+## Installation
+
+```julia
+using Pkg
+Pkg.add("ArrayAllocators")
+```
+
 ## Usage
 
 ```
