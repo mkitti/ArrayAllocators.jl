@@ -8,7 +8,7 @@ already been initialized by zeros due to security constraints. On many systems, 
 the allocator used by `Array{T}(undef, dims)`. In particular, in Python, [`numpy.zeros`](https://github.com/juliantaylor/numpy/commit/d271d977bdfb977959db1ff26956666f3836b56b) uses `calloc`, which may at times appear faster than `Base.zeros` in Julia.
 
 In contrast, `Base.zeros` allocates memory using `malloc` and then uses `fill!` to eagerly and explicitly fill the array with zeros.
-On some systems, this may be a redudnant operation since the operating system may already know the allocated memory is filled with zeros.
+On some systems, this may be a redundant operation since the operating system may already know the allocated memory is filled with zeros.
 
 This package makes `calloc` and other allocators available. Some of these allocators are specific to particular kinds of systems.
 
