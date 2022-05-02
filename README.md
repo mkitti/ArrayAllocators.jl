@@ -61,3 +61,7 @@ julia> @time Array{UInt8}(NumaAllocator(0), 2048, 2048);
 ## Discussion
 
 See https://discourse.julialang.org/t/faster-zeros-with-calloc/69860 for discussion about this approach.
+
+## License
+
+Per [LICENSE](LICENSE), ArrayAllocators.jl is licenesed under the MIT License.

@@ -10,8 +10,10 @@ Implements `ArrayAllocators.AbstractByteCalculator` by using `SaferIntegers.jl` 
 
 ```julia
 using Pkg
-Pkg.add("SafeByteCalculators")
+Pkg.add(url="https://github.com/mkitti/ArrayAllocators.jl", subdir="SafeByteCalculators")
 ```
+
+Currently, I do have not have plans to register this package. It mainly serves as an example of how to implement a custom `AbstractByteCalculator`.
 
 ## Basic usage
 
@@ -32,3 +34,7 @@ ERROR: OverflowError: 1024 * 9223372036854775807 overflowed for type Int64
 ## Documentation
 
 See the ArrayAllocators.jl [documentation](https://mkitti.github.io/ArrayAllocators.jl) for more information.
+
+## License
+
+Per [LICENSE](LICENSE), SafeByteCalculators.jl is licenesed under the MIT License.
