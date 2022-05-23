@@ -56,7 +56,7 @@ julia> @time Array{UInt8}(NumaAllocator(0), 2048, 2048);
 ## Subpackages
 
 * [NumaAllocators.jl](NumaAllocators): Allocate memory on Non-Uniform Memory Access (NUMA) nodes
-* [SafeByteCaculators.jl](SafeByteCalculators): Implement byte calculations using SaferIntegers.jl to detect integer overflow. Note that a form of integer overflow detection is implemented in ArrayAllocators.jl itself. This package just provides an alternative implementation.
+* [SafeByteCalculators.jl](SafeByteCalculators): Implement byte calculations using SaferIntegers.jl to detect integer overflow. Note that a form of integer overflow detection is implemented in ArrayAllocators.jl itself. This package just provides an alternative implementation.
 
 ## Discussion
 
