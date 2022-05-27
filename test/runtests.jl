@@ -1,6 +1,7 @@
 using Pkg
 using ArrayAllocators
 using ArrayAllocators.ByteCalculators
+using OffsetArrays
 using Test
 
 # Load in subpackages
@@ -46,4 +47,12 @@ using SafeByteCalculators
         @test reinterpret(Int, pointer(E)) % 2^16 == 0
     end
 
+    OA = OffsetArray{UInt8}(calloc, -1024:1023, -5:5)
+    @test all(OA .== 0)
+    @test size(OA) == (2048,11)
+    @test OA[-1024,-3] == 0
+    OA = OffsetArray{UInt8}(calloc, -5:3, Base.OneTo(9))
+    @test all(OA .== 0)
+    @test size(OA) == (9,9)
+    @test OA[-1,5] == 0
 end
