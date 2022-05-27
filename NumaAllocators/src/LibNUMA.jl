@@ -9,6 +9,7 @@ module LibNUMA
 
 using ..NumaAllocators: AbstractNumaAllocator
 import ArrayAllocators: AbstractArrayAllocator, nbytes, allocate
+import ArrayAllocators: lineage_finalizer
     
 using NUMA_jll
 
@@ -55,7 +56,7 @@ function wrap_numa(::Type{ArrayType}, ptr::Ptr{T}, dims) where {T, ArrayType <: 
         throw(OutOfMemoryError())
     end
     arr = unsafe_wrap(ArrayType, ptr, dims; own = false)
-    finalizer(numa_free, arr)
+    lineage_finalizer(numa_free, arr)
     return arr
 end
 

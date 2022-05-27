@@ -46,7 +46,9 @@ using SafeByteCalculators
         @test size(E) == (1024, 2048)
         @test reinterpret(Int, pointer(E)) % 2^16 == 0
     end
+end
 
+@testset "Composition with OffsetArrays.jl" begin
     OA = OffsetArray{UInt8}(calloc, -1024:1023, -5:5)
     @test all(OA .== 0)
     @test size(OA) == (2048,11)
@@ -55,4 +57,6 @@ using SafeByteCalculators
     @test all(OA .== 0)
     @test size(OA) == (9,9)
     @test OA[-1,5] == 0
+    numaOA = OffsetArray{UInt8}(numa(0), -5:5, 1:9)
+    @test numaOA[-5, 1] == numaOA[1]
 end
