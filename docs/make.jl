@@ -20,6 +20,7 @@ makedocs(;
         "Detailed Overview" => "detailed_overview.md",
         "Byte Calculators" => "bytecalculators.md",
         "NUMA Allocators" => "numa.md",
+        "Compositions" => "compositions.md",
         "API" => [
             "ArrayAllocators.jl" => "api.md",
             "ArrayAllocators.ByteCalculators" => "bytecalculators_api.md",
