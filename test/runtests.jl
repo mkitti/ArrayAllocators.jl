@@ -57,6 +57,8 @@ end
     @test all(OA .== 0)
     @test size(OA) == (9,9)
     @test OA[-1,5] == 0
-    numaOA = OffsetArray{UInt8}(numa(0), -5:5, 1:9)
-    @test numaOA[-5, 1] == numaOA[1]
+    @static if Sys.islinux() || Sys.iswindows()
+        numaOA = OffsetArray{UInt8}(numa(0), -5:5, 1:9)
+        @test numaOA[-5, 1] == numaOA[1]
+    end
 end
