@@ -15,7 +15,12 @@ using SafeByteCalculators
     A = zeros(UInt8, 2048, 2048);
     B = Array{UInt8}(calloc, 2048, 2048);
     M = Array{UInt8}(malloc, 1024, 4096)
+    Z = ArrayAllocators.zeros(UInt8, 2048, 2048)
+    Z2 = ArrayAllocators.zeros(UInt8, (2048, 2048))
     @test A == B
+    @test A == Z
+    @test size(Z) == (2048, 2048)
+    @test size(Z2) == (2048, 2048)
     @test size(M) == (1024, 4096)
     
     @test_throws OverflowError Array{UInt8}(calloc, 20480000, typemax(Int64))

@@ -29,6 +29,7 @@ abstract type AbstractByteCalculator{T} end
 function (::Type{B})(dims::Int...) where {T, B <: AbstractByteCalculator{T}}
     return B(dims)
 end
+
 function (::Type{B})(dims::AbstractUnitRange...) where {T, B <: AbstractByteCalculator{T}}
     return B(length.(dims))
 end

@@ -230,4 +230,6 @@ elseif Sys.isunix()
     const MemAlign = PosixMemAlign
 end
 
+include("zeros.jl")
+
 end # module ArrayAllocators
