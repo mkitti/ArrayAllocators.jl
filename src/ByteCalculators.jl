@@ -25,15 +25,16 @@ Parent abstract type for byte calculators, which calculate the total number of b
 """
 abstract type AbstractByteCalculator{T} end
 
-# Allow dimensions to be passed an individual arguments
+# Allow dimensions to be passed as individual arguments
 function (::Type{B})(dims::Int...) where {T, B <: AbstractByteCalculator{T}}
     return B(dims)
 end
-function (::Type{B})(ind::AbstractUnitRange...) where {T, B <: AbstractByteCalculator{T}}
-    return B(map(length, ind))
+
+function (::Type{B})(dims::AbstractUnitRange...) where {T, B <: AbstractByteCalculator{T}}
+    return B(length.(dims))
 end
-function (::Type{B})(ind::NTuple{N,AbstractUnitRange}) where {N, T, B <: AbstractByteCalculator{T}}
-    return B(map(length, ind))
+function (::Type{B})(dims::NTuple{N, AbstractUnitRange}) where {N, T, B <: AbstractByteCalculator{T}}
+    return B(length.(dims))
 end
 elsize(::AbstractByteCalculator{T}) where T = isbitstype(T) ? sizeof(T) : sizeof(Ptr)
 nbytes(b::AbstractByteCalculator{T}) where T = elsize(b) * length(b)

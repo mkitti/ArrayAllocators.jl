@@ -15,7 +15,7 @@ module Windows
 
 import ..ArrayAllocators: AbstractArrayAllocator, nbytes, allocate
 import ..ArrayAllocators: AbstractMemAlign, min_alignment, alignment
-import ..ArrayAllocators: iszeroinit
+import ..ArrayAllocators: iszeroinit, lineage_finalizer
 import Base: Array
 
 export WinMemAlign
@@ -183,7 +183,7 @@ function wrap_virtual(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray
         throw(OutOfMemoryError())
     end
     arr = unsafe_wrap(A, ptr, dims; own = false)
-    finalizer(virtual_free, arr)
+    lineage_finalizer(virtual_free, arr)
     return arr
 end
 wrap_virtual(ptr::Ptr{T}, dims) where T = wrap_virtual(Array{T}, ptr, dims)

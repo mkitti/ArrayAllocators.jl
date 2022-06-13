@@ -38,6 +38,7 @@ AbstractArrayAllocator
 AbstractMemAlign
 DefaultByteCalculator
 wrap_libc_pointer
+lineage_finalizer
 ```
 
 ## Platform Specific Interface

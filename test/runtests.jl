@@ -1,6 +1,7 @@
 using Pkg
 using ArrayAllocators
 using ArrayAllocators.ByteCalculators
+using OffsetArrays
 using Test
 
 # Load in subpackages
@@ -50,5 +51,19 @@ using SafeByteCalculators
         @test size(E) == (1024, 2048)
         @test reinterpret(Int, pointer(E)) % 2^16 == 0
     end
+end
 
+@testset "Composition with OffsetArrays.jl" begin
+    OA = OffsetArray{UInt8}(calloc, -1024:1023, -5:5)
+    @test all(OA .== 0)
+    @test size(OA) == (2048,11)
+    @test OA[-1024,-3] == 0
+    OA = OffsetArray{UInt8}(calloc, -5:3, Base.OneTo(9))
+    @test all(OA .== 0)
+    @test size(OA) == (9,9)
+    @test OA[-1,5] == 0
+    @static if Sys.islinux() || Sys.iswindows()
+        numaOA = OffsetArray{UInt8}(numa(0), -5:5, 1:9)
+        @test numaOA[-5, 1] == numaOA[1]
+    end
 end
