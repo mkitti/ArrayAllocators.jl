@@ -29,6 +29,12 @@ abstract type AbstractByteCalculator{T} end
 function (::Type{B})(dims::Int...) where {T, B <: AbstractByteCalculator{T}}
     return B(dims)
 end
+function (::Type{B})(ind::AbstractUnitRange...) where {T, B <: AbstractByteCalculator{T}}
+    return B(map(length, ind))
+end
+function (::Type{B})(ind::NTuple{N,AbstractUnitRange}) where {N, T, B <: AbstractByteCalculator{T}}
+    return B(map(length, ind))
+end
 elsize(::AbstractByteCalculator{T}) where T = isbitstype(T) ? sizeof(T) : sizeof(Ptr)
 nbytes(b::AbstractByteCalculator{T}) where T = elsize(b) * length(b)
 
