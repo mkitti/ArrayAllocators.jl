@@ -64,4 +64,4 @@ See https://discourse.julialang.org/t/faster-zeros-with-calloc/69860 for discuss
 
 ## License
 
-Per [LICENSE](LICENSE), ArrayAllocators.jl is licenesed under the MIT License.
+Per [LICENSE](LICENSE), ArrayAllocators.jl is licensed under the MIT License.
