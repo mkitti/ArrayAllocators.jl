@@ -27,4 +27,4 @@ See the [documentation](https://mkitti.github.io/ArrayAllocators.jl) for ArrayAl
 
 ## License
 
-Per [LICENSE](LICENSE), NumaAllocators.jl is licenesed under the MIT License.
+Per [LICENSE](LICENSE), NumaAllocators.jl is licensed under the MIT License.

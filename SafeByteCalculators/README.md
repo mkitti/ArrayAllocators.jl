@@ -37,4 +37,4 @@ See the ArrayAllocators.jl [documentation](https://mkitti.github.io/ArrayAllocat
 
 ## License
 
-Per [LICENSE](LICENSE), SafeByteCalculators.jl is licenesed under the MIT License.
+Per [LICENSE](LICENSE), SafeByteCalculators.jl is licensed under the MIT License.
