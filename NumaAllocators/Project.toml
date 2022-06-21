@@ -9,6 +9,7 @@ NUMA_jll = "7f51dc2b-bb24-59f8-b771-bb1490e4195d"
 
 [compat]
 ArrayAllocators = "0.3"
+NUMA_jll = "2.0"
 julia = "1"
 
 [extras]
