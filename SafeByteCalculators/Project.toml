@@ -1,7 +1,7 @@
 name = "SafeByteCalculators"
 uuid = "88ce4d4d-ee2f-4b4a-abd3-cbc3580a88f7"
 authors = ["Mark Kittisopikul <kittisopikulm@janelia.hhmi.org> and contributors"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 ArrayAllocators = "c9d4266f-a5cb-439d-837c-c97b191379f5"
@@ -9,7 +9,7 @@ SaferIntegers = "88634af6-177f-5301-88b8-7819386cfa38"
 
 [compat]
 SaferIntegers = "3"
-ArrayAllocators = "0.2"
+ArrayAllocators = "0.3"
 julia = "1"
 
 [extras]
