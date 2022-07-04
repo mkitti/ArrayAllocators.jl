@@ -24,15 +24,15 @@ Howard Hughes Medical Institute
 
 
 ```python
-In [2]: %timeit np.zeros((1024,1024), dtype="i8")
-787 µs ± 14.3 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+In[2]: %timeit np.zeros((256, 1024, 1024))
+31.8 µs ± 2.49 µs per loop (mean ± std. dev. of 7 runs, 10000 loops each)
 ```
 
 ## Julia
 
 ```julia
-julia> @time zeros(Int, 1024, 1024, 256);
-  1.207662 seconds (2 allocations: 2.000 GiB, 0.89% gc time)
+julia> @time zeros(1024, 1024, 256);
+  0.901352 seconds (2 allocations: 2.000 GiB, 0.62% gc time)
 ```
 
 ---
@@ -88,13 +88,13 @@ Array{UInt8}(MemAlign(2^16), 1024)
 julia> using ArrayAllocators
 
 julia> @time C = Array{Int}(calloc, 1024, 1024, 256);
-  0.000031 seconds (4 allocations: 2.000 GiB)
+  0.000033 seconds (4 allocations: 2.000 GiB)
 
 julia> @time A = Array{Int}(undef, 1024, 1024, 256);
-  0.001490 seconds (2 allocations: 2.000 GiB, 98.23% gc time)
+  0.000037 seconds (2 allocations: 2.000 GiB)
 
 julia> @time Z = zeros(1024, 1024, 256);
-  1.192039 seconds (2 allocations: 2.000 GiB, 5.69% gc time)
+  0.671271 seconds (2 allocations: 2.000 GiB, 9.43% gc time)
 
 julia> C == Z # always
 true
@@ -116,11 +116,11 @@ julia> import ArrayAllocators: zeros, ArrayAllocators
 julia> @time ArrayAllocators.zeros(1024, 1024, 256);
   0.000041 seconds (4 allocations: 2.000 GiB)
 
-julia> @time zeros(1024, 1024, 256); # Uses ArrayAllocators.zeros
-  0.000034 seconds (4 allocations: 2.000 GiB)
+julia> @time zeros(1024, 1024, 256);
+  0.000033 seconds (4 allocations: 2.000 GiB)
 
 julia> @time Base.zeros(1024, 1024, 256);
-  1.216448 seconds (2 allocations: 2.000 GiB, 5.71% gc time)
+  0.660283 seconds (2 allocations: 2.000 GiB, 0.70% gc time)
 ```
 
 ---
@@ -129,7 +129,7 @@ julia> @time Base.zeros(1024, 1024, 256);
 
 See https://discourse.julialang.org/t/faster-zeros-with-calloc/69860
 
-* `calloc` allocates and initialies memory lazily
+* `calloc` allocates and initializes memory lazily
 * `Base.zeros` allocates and initializes memory eagerly
 * This can confound your benchmarking. Allocation time may occur when writing to memory!
 ```julia
