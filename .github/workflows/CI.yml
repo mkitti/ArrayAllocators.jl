@@ -38,7 +38,7 @@ jobs:
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@latest
         with:
-          directories: src, NumaAllocators/src, SafteByteCalculators/src
+          directories: src,NumaAllocators/src,SafeByteCalculators/src
       - uses: codecov/codecov-action@v1
         with:
           file: lcov.info
