@@ -67,3 +67,5 @@ end
         @test numaOA[-5, 1] == numaOA[1]
     end
 end
+
+# Add coverage testing

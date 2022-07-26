@@ -174,9 +174,7 @@ function VirtualFreeEx(lpAddress)
     VirtualFreeEx(hCurrentProcess, lpAddress, 0, MEM_RELEASE)
 end
 
-function virtual_free(array::Array{T}) where T
-    VirtualFreeEx(array)
-end
+const virtual_free = VirtualFreeEx
 
 function wrap_virtual(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: AbstractArray{T}}
     if ptr == C_NULL

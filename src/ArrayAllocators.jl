@@ -21,6 +21,8 @@ module ArrayAllocators
 import Core: Array
 
 export malloc, calloc
+export AbstractArrayAllocator, UndefAllocator, MallocAllocator, CallocAllocator
+export MemAlign
 
 include("ByteCalculators.jl")
 
@@ -34,9 +36,6 @@ byte calculator used with subtypes of `AbstractArrayAllocator` when one is not
 specified.
 """
 const DefaultByteCalculator = CheckedMulByteCalculator
-
-export AbstractArrayAllocator, UndefAllocator, MallocAllocator, CallocAllocator
-export MemAlign
 
 """
     lineage_finalizer(f, x)

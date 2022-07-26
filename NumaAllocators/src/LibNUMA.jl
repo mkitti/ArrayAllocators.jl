@@ -13,6 +13,8 @@ import ArrayAllocators: lineage_finalizer
     
 using NUMA_jll
 
+# Limit exposed symbols on other platforms
+
 @static if ( VERSION >= v"1.6" && NUMA_jll.is_available() ) || isdefined(NUMA_jll, :libnuma)
     const libnuma = NUMA_jll.libnuma
 else
