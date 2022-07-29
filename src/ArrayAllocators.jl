@@ -47,10 +47,14 @@ function lineage_finalizer(f, x)
     try
         finalizer(f, x)
     catch err
-        if applicable(parent, x)
+        if applicable(parent, x) && parent(x) !== x
             lineage_finalizer(f, parent(x))
         else
-            rethrow(err)
+            if ismutabletype(typeof(x))
+                rethrow(err)
+            else
+                @debug("$(typeof(x)) is not mutable. Also `parent` does not apply or returns the same array. Cannot install finalizer.")
+            end
         end
     end
 end
@@ -106,9 +110,21 @@ function wrap_libc_pointer(::Type{A}, ptr::Ptr{T}, dims) where {T, A <: Abstract
     if ptr == C_NULL
         throw(OutOfMemoryError())
     end
-    # We use own = true, so we do not need Libc.free explicitly
-    arr = unsafe_wrap(A, ptr, dims; own = true)
-    return arr
+    try
+
+        # We use own = true, so we do not need Libc.free explicitly
+        # Immutable types such as OffsetArray may have implemented `Base.unsafe_wrap` with `own = true`
+        return unsafe_wrap(A, ptr, dims; own = true)
+    catch err
+        if ismutabletype(A)
+            rethrow(err)
+        else
+            # Unsafe_wrap failed and `A` is not mutable
+            # Proceed with `own = false` for MallocArray and other immutable types without finalizers
+            @debug("`unsafe_wrap($(A), ptr, dims; own = true)` failed. Using `own = false`")
+            return unsafe_wrap(A, ptr, dims; own = false)
+        end
+    end
 end
 wrap_libc_pointer(ptr::Ptr{T}, dims) where T = wrap_libc_pointer(Array{T}, ptr, dims)
 Base.unsafe_wrap(alloc::A, args...) where A <: LibcArrayAllocator = wrap_libc_pointer(args...)

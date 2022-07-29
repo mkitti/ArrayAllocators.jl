@@ -2,6 +2,7 @@ using Pkg
 using ArrayAllocators
 using ArrayAllocators.ByteCalculators
 using OffsetArrays
+import StaticTools: MallocArray, free
 using Test
 
 # Load in subpackages
@@ -66,6 +67,14 @@ end
         numaOA = OffsetArray{UInt8}(numa(0), -5:5, 1:9)
         @test numaOA[-5, 1] == numaOA[1]
     end
+end
+
+@testset "Composition with StaticTools.jl" begin
+    MA = MallocArray{Int}(calloc, 300)
+    @test all(MA .== 0)
+    @test size(MA) == (300,)
+    # Todo figure out to make this work with StaticTools.free
+    Libc.free(MA.pointer)
 end
 
 # Add coverage testing
