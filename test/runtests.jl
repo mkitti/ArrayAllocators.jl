@@ -68,4 +68,10 @@ end
     end
 end
 
+@testset "NumaAllocators.jl" begin
+    @test NumaAllocators.LibNUMA.numa_alloc_local(1024) != C_NULL
+    @test NumaAllocators.LibNUMA.numa_num_task_nodes() != 0
+    @test_throws OutOfMemoryError NumaAllocators.LibNUMA.wrap_numa(Array{Int}, Ptr{Int}(C_NULL), 1024)
+end
+
 # Add coverage testing

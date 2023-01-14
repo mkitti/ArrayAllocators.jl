@@ -38,7 +38,7 @@ function numa_free(mem, size)
 end
 
 function numa_num_task_nodes()
-    return ccall((:numa_numa_task_nodes, libnuma), Cint, ())
+    return ccall((:numa_num_task_nodes, libnuma), Cint, ())
 end
 
 function numa_max_node()
