@@ -58,3 +58,9 @@ Windows.MemExtendedParameterAddressRequirements
 ArrayAllocators.POSIX
 POSIX.PosixMemAlign
 ```
+
+## Convenience
+
+```@docs
+ArrayAllocators.zeros
+```

@@ -72,3 +72,17 @@ julia> @time fill!(U, 1);
 julia> @time fill!(U, 2);
   0.000136 seconds
 ```
+
+## Convenience methods
+
+Due to recurring and persistent demand, I've also added [`ArrayAllocators.zeros`](@ref) as a drop in replacement for `Base.zeros` that uses `calloc`.
+
+```julia
+julia> import ArrayAllocators: zeros
+
+julia> @time zeros(1024, 1024);
+  0.000028 seconds (3 allocations: 8.000 MiB)
+
+julia> @time Base.zeros(1024, 1024);
+  0.005573 seconds (2 allocations: 8.000 MiB)
+```
